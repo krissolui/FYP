@@ -1,15 +1,13 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 session_start();
 
 //Access deny when not login
-if(!isset($_SESSION['account'])) {
-    die("ACCESS DENIED");
-}
+accessDeny();
 
 //Check parameter
-if(!isset($_GET['deviceId']) || !isset($_GET['deviceIp'])) {
-    $_SESSION['error'] = "Missing parameter.";
+if(!checkParameter($_GET['deviceId']) || !checkParameter($_GET['deviceIp'])) {
     header('Location: device.php');
     return;
 }
@@ -36,13 +34,7 @@ if(isset($_POST['changeAdmin'])) {
     } else {
         //Change Device admin
         try {
-            $stmt = $pdo->prepare('UPDATE Device SET admin = :admin WHERE id = :deviceId AND ip_address = :deviceIp AND admin = :userId');
-            $stmt->execute(array(
-                ':admin' => $_POST['newAdminId'],
-                ':deviceId' => $_GET['deviceId'],
-                ':deviceIp' => $_GET['deviceIp'],
-                ':userId' => $_SESSION['userId']
-            ));
+            updateDeviceAdmin($pdo, $_POST['newAdminId'], $_GET['deviceId'], $_GET['deviceIp'], $_SESSION['userId']);
         } catch(Throwable $e) {
             header('Location: error.php');
             return;
@@ -50,11 +42,7 @@ if(isset($_POST['changeAdmin'])) {
 
         //Drop from DeviceMap
         try {
-            $stmt = $pdo->prepare('DELETE FROM DeviceMap WHERE user_id = :userId AND device_id = :deviceId AND family_id IS NULL');
-            $stmt->execute(array(
-                ':userId' => $_SESSION['userId'],
-                ':deviceId' => $_GET['deviceId']
-            ));
+            deleteDeviceMap($pdo, $_SESSION['userId'], $_GET['deviceId']);
     
             $_SESSION['success'] = 'Authority transfered to new admin. Device removed from you list.';
             header('Location: device.php');
@@ -69,12 +57,7 @@ if(isset($_POST['changeAdmin'])) {
 //Delete device
 if(isset($_POST['deleteDevice'])) {
     try {
-        $stmt = $pdo->prepare('DELETE FROM Device WHERE id = :deviceId AND ip_address = :deviceIp AND admin = :userId');
-        $stmt->execute(array(
-            ':deviceId' => $_GET['deviceId'],
-            ':deviceIp' => $_GET['deviceIp'],
-            ':userId' => $_SESSION['userId']
-        ));
+        deleteDevice($pdo, $_GET['deviceId'], $_GET['deviceIp'], $_SESSION['userId']);
 
         $_SESSION['success'] = "Device deleted.";
         header('Location: device.php');

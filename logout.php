@@ -1,11 +1,10 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 session_start();
 
 //Access deny when not login
-if(!isset($_SESSION['account'])) {
-    die("ACCESS DENIED");
-}
+accessDeny();
 
 if(isset($_POST['logout'])) {
     //Log out
@@ -26,6 +25,7 @@ if(isset($_POST['logout'])) {
 </head>
 <body>
     <h1>Do You Want To Log Out?</h1>
+    <?php printTitleBar('logout'); ?>
 
     <form method='POST'>
         <p><input type='submit' name='logout' value='Yes'/> &nbsp

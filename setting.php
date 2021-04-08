@@ -1,11 +1,10 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 session_start();
 
 //Access deny when not login
-if(!isset($_SESSION['account'])) {
-    die("ACCESS DENIED");
-}
+accessDeny();
 
 //Get user detail
 try {
@@ -19,7 +18,7 @@ try {
 
 //Edit profile
 if(isset($_POST['edit'])) {
-    if(strlen($_POST['name']) < 1 || strlen($_POST['email']) < 1) {
+    if(!checkName() || !checkEmail()) {
         $_SESSION['error'] = "Name and email are required";
         header('Location: setting.php');
         return;
@@ -35,14 +34,7 @@ if(isset($_POST['edit'])) {
                 header('Location: setting.php');
                 return;
             } else {
-                $stmt = $pdo->prepare('UPDATE User SET email = :newEmail, name = :newName WHERE id = :userId AND name = :name AND email = :email');
-                $stmt->execute(array(
-                    ':newEmail' => $_POST['email'],
-                    ':newName' => $_POST['name'],
-                    ':userId' => $_SESSION['userId'],
-                    ':name' => $detail['name'],
-                    ':email' => $detail['email']
-                ));
+                updateUserProfile($pdo, $_POST['email'], $_POST['name'], $_SESSION['userId'], $detail['email'], $detail['name']);
     
                 $_SESSION['account'] = $_POST['name'];
                 $_SESSION['success'] = "Profile updated.";
@@ -58,49 +50,38 @@ if(isset($_POST['edit'])) {
 
 //Change password
 if(isset($_POST['changePassword'])) {
-    $salt = 'ElecFypGroup64';
-    $oldPw = hash('md5', $salt. $_POST['oldPassword']);
-    $newPw = hash('md5', $salt. $_POST['newPassword']);
-
-    $_SESSION['success'] = 'OLD:' . $oldPw . '; NEW:' . $newPw . '; Saved:' . $detail['password'];
+    // $salt = 'ElecFypGroup64';
+    $oldPw = hashPassword($_POST['oldPassword']);
+    $newPw = hashPassword($_POST['newPassword']);
     
-    if(strlen($_POST['oldPassword']) < 1) {
+    if(!checkPasswordLength($_POST['oldPassword'])) {
         //Check old password entered
         $_SESSION['error'] = "Please enter you password for verification.";
         header('Location: setting.php');
         return;
-    } else if(strlen($_POST['newPassword']) < 6 || strlen($_POST['newPassword']) > 20) {
-        //Check password length
-        $_SESSION['error'] = "Password length must be 6-20.";
+    } else if(!checkPasswordLength($_POST['newPassword'])) {
         header('Location: setting.php');
         return;
-    } else if($_POST['newPassword'] !== $_POST['newPassword2']) {
-        //Check if password match
-        $_SESSION['error'] = "Passwords do not match.";
+    } else if(!checkPasswordMatch($_POST['newPassword'], $_POST['newPassword2'])) {
         header('Location: setting.php');
         return;
     } else {
         //Check old password correct
         try {
-            if($oldPw !== $detail['password']) {
+            if(!checkPasswordMatch($oldPw, $detail['password'])) {
                 //Password incorrect
                 $_SESSION['error'] = 'Incorrect password.';
                 header('Location: setting.php');
                 return;
-            } else if($newPw === $detail['password']) {
+            } else if(checkPasswordMatch($newPw, $detail['password'])) {
                 //New password = Old password
                 $_SESSION['error'] = "Please choose a new password.";
                 header('Location: setting.php');
                 return;
             } else {
-                //Update password
-                $stmt = $pdo->prepare('UPDATE User SET password = :newPw WHERE id = :userId AND email = :email');
-                $stmt->execute(array(
-                    ':newPw' => $newPw,
-                    ':userId' => $_SESSION['userId'],
-                    ':email' => $detail['email']
-                ));
+                updateUserPassword($pdo, $newPw, $_SESSION['userId'], $detail['email']);
 
+                unset($_SESSION['error']);
                 $_SESSION['success'] = "Password updated.";
                 header('Location: setting.php');
                 return;
@@ -122,27 +103,11 @@ if(isset($_POST['changePassword'])) {
 <body>
 <header>
     <h1>My Profile</h1>
-    <ul id="selectPage">
-        <li><a href="index.php">Home</a></li>
-        <li><a href="family.php">My Family</a></li>
-        <li><a href="device.php">My Device</a></li>
-        <li id="page"><a href="setting.php">Profile Setting</a></li>
-        <li><a href="contact.php">Contact Us</a></li>
-        <li><a href="logout.php">Log Out</a></li>
-    </ul>
+    <?php printTitleBar('setting'); ?>
 </header>
 
 <main> 
-<?php
-    if(isset($_SESSION['error'])) {
-        echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
-        unset($_SESSION['error']);
-    }
-    if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
-        unset($_SESSION['success']);
-    }
-?>
+<?php flashMessage(); ?>
 
 <section id="current setting">
     <p>Name: <?=$detail['name']?></p>
@@ -163,10 +128,11 @@ if(isset($_POST['changePassword'])) {
 <section id="changePassword" hidden>
 <p><button onclick="toggleVisibility('changePassword', true)">Hide</button></p>
     <form method="post">
-        <p>Current Password: <input type="password" name="oldPassword" required/></p>
-        <p>New Password: <input type="password" name="newPassword"/>
+        <p>Current Password: <input type="password" name="oldPassword" class="password" equired/></p>
+        <p>New Password: <input type="password" name="newPassword" class="password"/>
         <span style="color: red">^6-20 characters</span></p>
-        <p>Confirm New Password: <input type="password" name="newPassword2"/></p>
+        <p>Confirm New Password: <input type="password" name="newPassword2" class="password"/></p>
+        <p><input type="checkbox" onclick="togglePasswordVisibility('password')">Show Password</p>
         <p><input type="submit" name="changePassword" value="Submit"/></p>
     </form>
 </section>
@@ -190,6 +156,18 @@ if(isset($_POST['changePassword'])) {
         } else {
             if(!edit.hasAttribute("hidden")) {
                 edit.setAttribute("hidden", true);
+            }
+        }
+    }
+    
+    function togglePasswordVisibility(pw) {
+        var elements = document.getElementsByClassName(pw);
+        for(var i = 0; i < elements.length; i++) {
+            var pass = elements[i];
+            if (pass.type === "password") {
+                pass.type = "text";
+            } else {
+                pass.type = "password";
             }
         }
     }

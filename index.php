@@ -1,5 +1,6 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 define('TIMEZONE', 'HongKong');
 date_default_timezone_set(TIMEZONE);
 session_start();
@@ -15,34 +16,16 @@ session_start();
 <h1>Welcome to the Smart Power Tracker</h1>
 <?php
     if(isset($_SESSION['account'])) {
-        echo('<ul id="selectPage">
-        <li id="page"><a href="index.php">Home</a></li>
-        <li><a href="family.php">My Family</a></li>
-        <li><a href="device.php">My Device</a></li>
-        <li><a href="setting.php">Profile Setting</a></li>
-        <li><a href="contact.php">Contact Us</a></li>
-        <li><a href="logout.php">Log Out</a></li>
-        </ul>');
+        printTitleBar('home');
         echo('<h2>Hello ' . $_SESSION['account'] . '!</h2>');
+    } else {
+        printTitleBar('unlogHome');
     }
 ?>
 </header>
 
 <main>
-<?php
-    if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
-        unset($_SESSION['success']);
-    }
-
-    //Not login
-    if(!isset($_SESSION['account'])) {
-        echo('<p><a href="login.php">Login</a></p>');
-        echo('<p><a href="signup.php">Sign Up</a></p>');
-    } else {
-        //Login
-    }
-?>
+<?php flashMessage() ?>
 </main>
 </body>
 </html>

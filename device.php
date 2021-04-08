@@ -1,18 +1,17 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 define('TIMEZONE', 'HongKong');
 date_default_timezone_set(TIMEZONE);
 session_start();
 
 //Access deny when not login
-if(!isset($_SESSION['account'])) {
-    die("ACCESS DENIED");
-}
+accessDeny();
 
 //Add new device
 if(isset($_POST['newDevice'])) {
     //Missing field
-    if(strlen($_POST['deviceName']) < 1 || strlen($_POST['deviceLocation']) < 1 || strlen($_POST['deviceIp']) < 1 || !isset($_POST['deviceType']) || !isset($_POST['family'])) {
+    if(!checkParameter($_POST['deviceName']) || !checkParameter($_POST['deviceLocation']) || !checkParameter($_POST['deviceIp']) || !checkParameter($_POST['deviceType'])) {
         $_SESSION['error'] = "All field are required.";
         header('Location: device.php');
         return;
@@ -33,14 +32,7 @@ if(isset($_POST['newDevice'])) {
         } else {
             //Add to Device
             try {
-                $stmt = $pdo->prepare('INSERT INTO Device (name, location, type, ip_address, admin) values (:deviceName, :deviceLocation, :deviceType, :deviceIp, :admin)');
-                $stmt->execute(array(
-                    ':deviceName' => $_POST['deviceName'],
-                    ':deviceLocation' => $_POST['deviceLocation'],
-                    ':deviceType' => $_POST['deviceType'],
-                    ':deviceIp' => $_POST['deviceIp'],
-                    ':admin' => $_SESSION['userId']
-                ));
+                addDevice($pdo, $_POST['deviceName'], $_POST['deviceLocation'], $_POST['deviceType'], $_POST['deviceIp'], $_SESSION['userId']);
             } catch(Throwable $e) {
                 header('Location: error.php');
                 return;
@@ -58,22 +50,14 @@ if(isset($_POST['newDevice'])) {
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 $deviceId = $row['id'];
 
-                $stmt = $pdo->prepare('INSERT INTO DeviceMap (device_id, user_id) values (:deviceId, :userId)');
-                $stmt->execute(array(
-                    ':deviceId' => $deviceId,
-                    ':userId' => $_SESSION['userId']
-                ));
+                addDeviceMapDirectly($pdo, $deviceId, $_SESSION['userId']);
+
                 if(strlen($_POST['family']) > 0) {
                     $stmt = $pdo->prepare('SELECT user_id FROM FamilyMap WHERE family_id = :familyId');
                     $stmt->execute(array(':familyId' => $_POST['family']));
                     $row = $stmt->fetchAll();
                     foreach($row as $user) {
-                        $stmt = $pdo->prepare('INSERT INTO DeviceMap (device_id, user_id, family_id) values (:deviceId, :userId, :familyId)');
-                        $stmt->execute(array(
-                            ':deviceId' => $deviceId,
-                            ':userId' => $user['user_id'],
-                            ':familyId' => $_POST['family']
-                        ));
+                        addDeviceMapWithFamily($pdo, $deviceId, $user['user_id'], $_POST['family']);
                     }
                 }
             } catch(Throwable $e) {
@@ -91,7 +75,7 @@ if(isset($_POST['newDevice'])) {
 //Add to existing device
 if(isset($_POST['existingDevice'])) {
     //Missing field
-    if(strlen($_POST['deviceIp']) < 1) {
+    if(!checkParameter($_POST['deviceIp'])) {
         $_SESSION['error'] = "All field are required.";
         header('Location: device.php');
         return;
@@ -130,21 +114,17 @@ if(isset($_POST['existingDevice'])) {
             } else {
                 //Add to DeviceMap
                 try {
-                    $stmt = $pdo->prepare('INSERT INTO DeviceMap (device_id, user_id) values (:deviceId, :userId)');
-                    $stmt->execute(array(
-                        ':deviceId' => $deviceId,
-                        ':userId' => $_SESSION['userId']
-                    ));
+                    addDeviceMapDirectly($pdo, $deviceId, $_SESSION['userId']);
+                    $_SESSION['success'] = 'Device added.';
                 } catch(Throwable $e) {
                     header('Location: error.php');
                     return;
                 }
-                if(strlen($_POST['family']) > 0) {
+                if(checkParameter($_POST['family'])) {
                     try {
                         $stmt = $pdo->prepare('SELECT * FROM DeviceMap WHERE device_id = :deviceId AND family_id = :familyId');
                         $stmt->execute(array(
                             ':deviceId' => $deviceId,
-                            ':userId' => $_SESSION['userId'],
                             ':familyId' => $_POST['family']
                         ));
                         $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -157,12 +137,7 @@ if(isset($_POST['existingDevice'])) {
                             $stmt->execute(array(':familyId' => $_POST['family']));
                             $row = $stmt->fetchAll();
                             foreach($row as $user) {
-                                $stmt = $pdo->prepare('INSERT INTO DeviceMap (device_id, user_id, family_id) values (:deviceId, :userId, :familyId)');
-                                $stmt->execute(array(
-                                    ':deviceId' => $deviceId,
-                                    ':userId' => $user['user_id'],
-                                    ':familyId' => $_POST['family']
-                                ));
+                                addDeviceMapWithFamily($pdo, $deviceId, $user['user_id'], $_POST['family']);
                             }
                         }
                     } catch(Throwable $e) {
@@ -170,7 +145,6 @@ if(isset($_POST['existingDevice'])) {
                         return;
                     }
                 }
-                $_SESSION['success'] = 'Device added.';
                 header('Location: device.php');
                 return;
             }
@@ -178,7 +152,7 @@ if(isset($_POST['existingDevice'])) {
     }
 }
 
-//Remove devie
+//Remove device
 if(isset($_POST['removeDevice'])) {
     try {
         $stmt = $pdo->prepare('SELECT * FROM DeviceMap WHERE device_id = :deviceId AND user_id = :userId AND family_id IS NULL');
@@ -200,12 +174,7 @@ if(isset($_POST['removeDevice'])) {
                 header('Location: deleteDevice.php?deviceId=' . $device['id'] . '&deviceIp=' . $device['ip_address']);
                 return;
             }
-            //Remove from DeviceMap if it was connected directly
-            $stmt = $pdo->prepare('DELETE FROM DeviceMap WHERE device_id = :deviceId AND user_id = :userId AND family_id IS NULL');
-            $stmt->execute(array(
-                ':deviceId' => $_POST['deviceId'],
-                ':userId' => $_SESSION['userId']
-            ));
+            deleteDeviceMap($pdo, $_SESSION['userId'], $_POST['deviceId']);
     
             $_SESSION['success'] = 'Device removed.';
             header('Location: device.php');
@@ -243,9 +212,11 @@ try {
 }
 
 //Prepare graph
-if(isset($_GET['displayType']) && strlen($_GET['displayType']) > 0) {
+// if(isset($_GET['displayType']) && strlen($_GET['displayType']) > 0) {
+if(checkParameter($_GET['displayType'])) {
     $displayType = $_GET['displayType'];
 } else {
+    unset($_SESSION['error']);
     $displayType = 'Device';
 }
 
@@ -302,24 +273,9 @@ if(isset($_GET['displayTime']) && strlen($_GET['displayTime']) > 0) {
 
 //Generate devices' power consumption
 //$numOfRow: every 10 minutes
-switch($displayTime) {
-    case 'Day':
-        $numOfRow = 24 * 6;
-        $timeFormat = "hh:mm TT";
-        break;
-    case 'Week':
-        $numOfRow = 7 * 24 * 6;
-        $timeFormat = "D MMM hh:mm TT";
-        break;
-    case 'Month':
-        $numOfRow = 30 * 24 * 6;
-        $timeFormat = "D MMM hh:mm TT";
-        break;
-    case 'Year':
-        $numOfRow = 365 * 24 * 6;
-        $timeFormat = "D MMM YYYY hh:mm TT";
-        break;
-}
+$numOfRow = 0;
+$timeFormat ='';
+setDisplayTime($displayTime, $numOfRow, $timeFormat);
 
 //Get each device's record
 // Get average
@@ -346,61 +302,13 @@ foreach($devices as $device) {
     } else {
         $avg = 0;
     }
-    // array_push($avgs, array($device['device_id'] => $avg));
     $avgs[$device['device_id']] = $avg;
 }
 
 //Generate $dataPoints for graph
 $dataPoints = array();
 $total = 0;
-switch($displayType) {
-    case 'Device':
-        foreach($devices as $device) {
-            $deviceId = $device['device_id'];
-            array_push($dataPoints, array(
-                "label" => $labels[$deviceId],
-                "y" => $avgs[$deviceId]
-            ));
-            $total += $avgs[$deviceId];
-        }
-        break;
-    case 'Type':
-        foreach($labels as $label) {
-            $typeId = array_keys($labels, $label)[0];
-            $sum = 0;
-
-            foreach($details as $detail) {
-                if($detail['type'] == $typeId) {
-                    $sum += $avgs[$detail['id']];
-                }
-            }
-            
-            array_push($dataPoints, array(
-                "label" => $label,
-                "y" => $sum
-            ));
-            $total += $sum;
-        }
-        break;
-    case 'Location':
-        foreach($labels as $label) {
-            $locationId = array_keys($labels, $label)[0];
-            $sum = 0;
-
-            foreach($details as $detail) {
-                if($detail['location'] == $locationId) {
-                    $sum += $avgs[$detail['id']];
-                }
-            }
-            
-            array_push($dataPoints, array(
-                "label" => $label,
-                "y" => $sum
-            ));
-            $total += $sum;
-        }
-        break;
-}
+setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $dataPoints);
 ?>
 
 <html lang='en'>
@@ -435,27 +343,11 @@ switch($displayType) {
 <body>
 <header>
     <h1><?=$_SESSION['account']?>'s Device</h1>
-    <ul id="selectPage">
-        <li><a href="index.php">Home</a></li>
-        <li><a href="family.php">My Family</a></li>
-        <li id="page"><a href="device.php">My Device</a></li>
-        <li><a href="setting.php">Profile Setting</a></li>
-        <li><a href="contact.php">Contact Us</a></li>
-        <li><a href="logout.php">Log Out</a></li>
-    </ul>
+    <?php printTitleBar('device'); ?>
 </header>
 
 <main>
-<?php
-    if(isset($_SESSION['error'])) {
-        echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
-        unset($_SESSION['error']);
-    }
-    if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
-        unset($_SESSION['success']);
-    }
-?>
+    <?php flashMessage(); ?>
 
 <!-- Add device -->
 <section id="add" hidden>
@@ -551,19 +443,7 @@ switch($displayType) {
 </section>
 
 <!-- Remove device -->
-<section id="remove" hidden>
-    <div id="removeDevice">
-        <h3>Are you sure you want to remove this device?</h3>
-        <form method="post">
-            <p id="showDeviceName"></p>
-            <input type="hidden" name="deviceName" value="" id="deviceName"/>
-            <input type="hidden" name="deviceId" value="" id="deviceId"/>
-            <input type="hidden" name="deviceIp" value="" id="deviceIp"/>
-            <p><input type="submit" name="removeDevice" value="Yes"/>
-            <button onclick="toggleVisibility('remove')">No</button></p>
-        </form>
-    </div>
-</section>
+<?php printRemoveDevice(); ?>
 
 <section id="diagram" <?php if($total == 0) {echo('hidden');} ?>>
 <!-- Select display type -->
@@ -614,6 +494,7 @@ switch($displayType) {
                 return;
             }
 
+            echo('<tr>');
             echo('<td><a href="deviceDetail.php?deviceName=' . $deviceDetail['name'] . '&deviceIp=' . $deviceDetail['ip_address'] . '">' . $deviceDetail['name'] . '</a></td>');
             echo('<td>' . $type['name'] . '</td>');
             echo('<td>' . $location['name'] . '</td>');

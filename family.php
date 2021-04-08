@@ -1,11 +1,10 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 session_start();
 
 //Access deny when not login
-if(!isset($_SESSION['account'])) {
-    die("ACCESS DENIED");
-}
+accessDeny();
 
 //Add new family
 if(isset($_POST['newFamily'])) {
@@ -17,12 +16,7 @@ if(isset($_POST['newFamily'])) {
     } else {
         //Add to Family
         try {
-            $stmt = $pdo->prepare('INSERT INTO Family (name, admin) values (:familyName, :admin)');
-            $stmt->execute(array(
-                ':familyName' => $_POST['familyName'],
-                ':admin' => $_SESSION['userId']
-            ));
-            $familyId = $pdo->lastInsertId();
+            $familyId = addFamily($pdo, $_POST['familyName'], $_SESSION['userId']);
         } catch(Throwable $e) {
             header('Location: error.php');
             return;
@@ -30,11 +24,7 @@ if(isset($_POST['newFamily'])) {
         
         //Add to FamilyMap
         try {
-            $stmt = $pdo->prepare('INSERT INTO FamilyMap (user_id, family_id) values (:userId, :familyId)');
-            $stmt->execute(array(
-                ':userId' => $_SESSION['userId'],
-                ':familyId' => $familyId
-            ));
+            addFamilyMap($pdo, $_SESSION['userId'], $familyId);
         } catch(Throwable $e) {
             header('Location: error.php');
             return;
@@ -88,11 +78,7 @@ if(isset($_POST['existingFamily'])) {
             } else {
                 //Add to FamilyMap
                 try {
-                    $stmt = $pdo->prepare('INSERT INTO FamilyMap (user_id, family_id) values (:userId, :familyId)');
-                    $stmt->execute(array(
-                        ':userId' => $_SESSION['userId'],
-                        ':familyId' => $familyId
-                    ));
+                    addFamilyMap($pdo, $_SESSION['userId'], $familyId);
                 } catch(Throwable $e) {
                     header('Location: error.php');
                     return;
@@ -105,12 +91,7 @@ if(isset($_POST['existingFamily'])) {
                     $device = $stmt->fetchAll();
 
                     foreach($device as $dev) {
-                        $stmt = $pdo->prepare('INSERT INTO DeviceMap (device_id, user_id, family_id) values (:deviceId, :userId, :familyId)');
-                        $stmt->execute(array(
-                            ':deviceId' => $dev['device_id'],
-                            ':userId' => $_SESSION['userId'],
-                            ':familyId' => $familyId
-                        ));
+                        addDeviceMapWithFamily($pdo, $dev['device_id'], $_SESSION['userId'], $familyId);
                     }
                 } catch(Throwable $e) {
                     header('Location: error.php');
@@ -132,7 +113,7 @@ if(isset($_POST['removeFamily']) && isset($_POST['familyId'])) {
         $stmt = $pdo->prepare('SELECT admin FROM Family WHERE id = :familyId');
         $stmt->execute(array(':familyId' => $_POST['familyId']));
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if($row['admin'] === $_SESSION['userId']) {
+        if(checkAdmin($row['admin'])) {
             //Ask if delete the family
             header('Location: deleteFamily.php?familyId=' . $_POST['familyId']);
             return;
@@ -143,19 +124,9 @@ if(isset($_POST['removeFamily']) && isset($_POST['familyId'])) {
     }
 
     try {
-        //Remove from FamilyMap
-        $stmt = $pdo->prepare('DELETE FROM FamilyMap WHERE user_id = :userId AND family_id = :familyId');
-        $stmt->execute(array(
-            ':userId' => $_SESSION['userId'],
-            ':familyId' => $_POST['familyId']
-        ));
+        deleteFamilyMap($pdo, $_SESSION['userId'], $_POST['familyId']);
 
-        //Remove device connected through family
-        $stmt = $pdo->prepare('DELETE FROM DeviceMap WHERE user_id = :userId AND family_id = :familyId');
-        $stmt->execute(array(
-            ':userId' => $_SESSION['userId'],
-            ':familyId' => $_POST['familyId']
-        ));
+        deleteDeviceMapThroughFamily($pdo, $_SESSION['userId'], $_POST['familyId']);
 
         $_SESSION['success'] = 'Removed from family.';
         header('Location: family.php');
@@ -185,27 +156,11 @@ try {
 <body>
 <header>
     <h1><?=$_SESSION['account']?>'s Family</h1>
-    <ul id="selectPage">
-        <li><a href="index.php">Home</a></li>
-        <li id="page"><a href="family.php">My Family</a></li>
-        <li><a href="device.php">My Device</a></li>
-        <li><a href="setting.php">Profile Setting</a></li>
-        <li><a href="contact.php">Contact Us</a></li>
-        <li><a href="logout.php">Log Out</a></li>
-    </ul>
+    <?php printTitleBar('family'); ?>
 </header>
 
 <main>
-<?php
-    if(isset($_SESSION['error'])) {
-        echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
-        unset($_SESSION['error']);
-    }
-    if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
-        unset($_SESSION['success']);
-    }
-?>
+<?php flashMessage() ?>
 
 <!-- Add family -->
 <section id="add" hidden>

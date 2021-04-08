@@ -1,5 +1,6 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 session_start();
 
 //Return;
@@ -8,14 +9,13 @@ if(isset($_POST['cancel'])) {
     return;
 }
 
-if(isset($_POST['email']) && isset($_POST['password'])) {
-    if(strlen($_POST['email']) < 1 || strlen($_POST['password']) < 1) {
+if(isset($_POST['login'])) {
+    if(!checkParameter($_POST['email']) || !checkParameter($_POST['password'])) {
         $_SESSION['error'] = 'Email and password are required';
         header('Location: login.php');
         return;
     } else {
-        $salt = 'ElecFypGroup64';
-        $pw = hash('md5', $salt. $_POST['password']);
+        $pw = hashPassword($_POST['password']);
 
         $stmt = $pdo->prepare("SELECT * FROM User WHERE email = :email");
         $stmt->execute(array(':email' => $_POST['email']));
@@ -55,20 +55,16 @@ if(isset($_POST['email']) && isset($_POST['password'])) {
 <body>
     <header>
         <h1>Please Login</h1>
+        <?php printTitleBar('login'); ?>
     </header>
 
     <main>
-        <?php
-            if(isset($_SESSION['error'])) {
-                echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
-                unset($_SESSION['error']);
-            }
-        ?>
+        <?php flashMessage(); ?>
         <form method="post">
             <p>Email: <input type="email" name="email" value="<?= $_SESSION['email']?>"/></p>
             <p>Password: <input type="password" name="password" id="password"/></p>
             <p><input type="checkbox" onclick="toggleVisibility()">Show Password</p>
-            <p><input type="submit" value="Login"/>&nbsp
+            <p><input type="submit" name="login" value="Login"/>&nbsp
             <input type='submit' name='cancel' value='Cancel'/></p>
         </form>
     </main>

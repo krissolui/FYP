@@ -1,5 +1,6 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 session_start();
     //Return;
     if(isset($_POST['cancel'])) {
@@ -7,8 +8,8 @@ session_start();
         return;
     }
 
-    if(isset($_POST['firstName']) && isset($_POST['lastName']) && isset($_POST['email']) && isset($_POST['password']) && isset($_POST['password2'])) {
-        if(strlen($_POST['firstName']) < 1 || strlen($_POST['lastName']) < 1 || strlen($_POST['email']) < 1 || strlen($_POST['password']) < 1 || strlen($_POST['password2']) < 1) {
+    if(isset($_POST['signUp'])) {
+        if(!checkParameter($_POST['firstName']) || !checkParameter($_POST['lastName']) || !checkParameter($_POST['email']) || !checkParameter($_POST['password']) || !checkParameter($_POST['password2'])) {
             $_SESSION['error'] = 'All fields are required';
             header('Location: signup.php');
             return;
@@ -74,6 +75,7 @@ session_start();
 <body>
     <header>
         <h1>Please Sign Up</h1>
+        <?php printTitleBar('signup'); ?>
     </header>
 
     <main>

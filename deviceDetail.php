@@ -1,21 +1,15 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 define('TIMEZONE', 'HongKong');
 date_default_timezone_set(TIMEZONE);
 session_start();
 
 //Access deny when not login
-if(!isset($_SESSION['account'])) {
-    die("ACCESS DENIED");
-}
+accessDeny();
 
 //Check missing parameter
-if(!isset($_GET['deviceIp']) || !isset($_GET['deviceName'])) {
-    $_SESSION['error'] = "Parameter missing.";
-    header('Location: device.php');
-    return;
-} else if(strlen($_GET['deviceIp']) < 1 || strlen($_GET['deviceName']) < 1) {
-    $_SESSION['error'] = "Invalid parameter.";
+if(!checkParameter($_GET['deviceIp']) || !checkParameter($_GET['deviceName'])) {
     header('Location: device.php');
     return;
 }
@@ -59,22 +53,23 @@ try {
 
 //Add to other family
 if(isset($_POST['addToFamily'])) {
-    if(strlen($_POST['familyId']) < 1) {
+    if(!checkParameter($_POST['familyId'])) {
+        unset($_SESSION['error']);
+        header('Location: deviceDetail.php?deviceName=' . $_GET['deviceName'] . '&deviceIp=' . $_GET['deviceIp']);
         return;
     } else {
         try {
             $stmt = $pdo->prepare('SELECT user_id FROM FamilyMap WHERE family_id = :familyId');
             $stmt->execute(array(':familyId' => $_POST['familyId']));
             $row = $stmt->fetchAll();
+            // $row = getUserIdFromFamilyMap($pdo, $_POST['familyId']);
 
             foreach($row as $user) {
-                $stmt = $pdo->prepare('INSERT INTO DeviceMap (device_id, user_id, family_id) values (:deviceId, :userId, :familyId)');
-                $stmt->execute(array(
-                    ':deviceId' => $deviceId,
-                    ':userId' => $_SESSION['userId'],
-                    ':familyId' => $_POST['familyId']
-                ));
+                addDeviceMapWithFamily($pdo, $deviceId, $user['user_id'], $_POST['familyId']);
             }
+            $_SESSION['success'] = "Device added to new family.";
+            header('Location: deviceDetail.php?deviceName=' . $_GET['deviceName'] . '&deviceIp=' . $_GET['deviceIp']);
+            return;
         } catch(Throuwable $e) {
             header('Location: error.php');
             return;
@@ -142,32 +137,18 @@ try {
 }
 
 //Prepare graph
-if(isset($_GET['displayTime']) && strlen($_GET['displayTime']) > 0) {
+if(checkParameter($_GET['displayTime'])) {
     $displayTime = $_GET['displayTime'];
 } else {
+    unset($_SESSION['error']);
     $displayTime = 'Day';
 }
 
 //$numOfRow: each 10 minutes
 $now = time();
-switch($displayTime) {
-    case 'Day':
-        $numOfRow = 24 * 6;
-        $timeFormat = "hh:mm TT";
-        break;
-    case 'Week':
-        $numOfRow = 7 * 24 * 6;
-        $timeFormat = "D MMM hh TT";
-        break;
-    case 'Month':
-        $numOfRow = 30 * 24 * 6;
-        $timeFormat = "D MMM hh TT";
-        break;
-    case 'Year':
-        $numOfRow = 365 * 24 * 6;
-        $timeFormat = "D MMM YYYY hh TT";
-        break;
-}
+$numOfRow = 0;
+$timeFormat = '';
+setDisplayTime($displayTime, $numOfRow, $timeFormat);
 $start = $now - $numOfRow * 10 * 60;
 
 //Get device record
@@ -316,17 +297,12 @@ try {
 <body>
 <header>
     <h1>Device Detail</h1>
-    <ul id="selectPage">
-        <li><a href="index.php">Home</a></li>
-        <li><a href="family.php">My Family</a></li>
-        <li><a href="device.php">My Device</a></li>
-        <li><a href="setting.php">Profile Setting</a></li>
-        <li><a href="contact.php">Contact Us</a></li>
-        <li><a href="logout.php">Log Out</a></li>
-    </ul>
+    <?php printTitleBar('device'); ?>
 </header>
 
 <main>
+    <?php flashMessage(); ?>
+
 <section id="diagram" <?php if(!$records){echo('hidden');}?>>
 <!-- Change display type (hour, day, month, year) -->
 <ul>

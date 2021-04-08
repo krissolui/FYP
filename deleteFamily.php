@@ -1,15 +1,13 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 session_start();
 
 //Access deny when not login
-if(!isset($_SESSION['account'])) {
-    die("ACCESS DENIED");
-}
+accessDeny();
 
 //Check parameter
-if(!isset($_GET['familyId'])) {
-    $_SESSION['error'] = "Missing parameter.";
+if(!checkParameter($_GET['familyId'])) {
     header('Location: family.php');
     return;
 }
@@ -35,12 +33,7 @@ if(isset($_POST['changeAdmin'])) {
     } else {
         //Change Family admin
         try {
-            $stmt = $pdo->prepare('UPDATE Family SET admin = :admin WHERE id = :familyId AND admin = :userId');
-            $stmt->execute(array(
-                ':admin' => $_POST['newAdminId'],
-                ':familyId' => $_GET['familyId'],
-                ':userId' => $_SESSION['userId']
-            ));
+            updateFamilyAdmin($pdo, $_POST['newAdminId'], $_GET['familyId'], $_SESSION['userId']);
         } catch(Throwable $e) {
             header('Location: error.php');
             return;
@@ -48,12 +41,7 @@ if(isset($_POST['changeAdmin'])) {
 
         //Drop from DeviceMap
         try{
-            $stmt = $pdo->prepare('DELETE FROM DeviceMap WHERE user_id = :userId AND family_id = :familyId');
-            $stmt->execute(array(
-                ':userId' => $_SESSION['userId'],
-                ':familyId' => $_GET['familyId']
-            ));
-
+            deleteDeviceMapThroughFamily($pdo, $_SESSION['userId'], $_GET['familyId']);
         } catch(Throwable $e) {
             header('Location: error.php');
             return;
@@ -61,11 +49,7 @@ if(isset($_POST['changeAdmin'])) {
 
         //Drop from FamilyMap
         try {
-            $stmt = $pdo->prepare('DELETE FROM FamilyMap WHERE user_id = :userId AND family_id = :familyId');
-            $stmt->execute(array(
-                ':userId' => $_SESSION['userId'],
-                ':familyId' => $_GET['familyId']
-            ));
+            deleteFamilyMap($pdo, $_SESSION['userId'], $_GET['familyId']);
     
             $_SESSION['success'] = 'Authority transfered to new admin and removed from family.';
             header('Location: family.php');
@@ -80,12 +64,7 @@ if(isset($_POST['changeAdmin'])) {
 //Delete family
 if(isset($_POST['deleteFamily'])) {
     try {
-        $stmt = $pdo->prepare('DELETE FROM Family WHERE id = :familyId AND admin = :userId');
-        $stmt->execute(array(
-            ':familyId' => $_GET['familyId'],
-            ':userId' => $_SESSION['userId']
-        ));
-
+        deleteFamily($pdo, $_GET['familyId'], $_SESSION['userId']);
 
         $_SESSION['success'] = "Family deleted.";
         header('Location: family.php');
@@ -121,16 +100,7 @@ try {
 </header>
 
 <main>
-<?php
-    if(isset($_SESSION['error'])) {
-        echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
-        unset($_SESSION['error']);
-    }
-    if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
-        unset($_SESSION['success']);
-    }
-?>
+<?php flashMessage(); ?>
 
 <!-- Ask if delete family -->
 <p>You are the admin of the family. Do you want to delete the family?<p>

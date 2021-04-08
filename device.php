@@ -10,6 +10,9 @@ accessDeny();
 
 //Add new device
 if(isset($_POST['newDevice'])) {
+    $_SESSION['error'] = "All field are required.";
+        header('Location: device.php');
+        return;
     //Missing field
     if(!checkParameter($_POST['deviceName']) || !checkParameter($_POST['deviceLocation']) || !checkParameter($_POST['deviceIp']) || !checkParameter($_POST['deviceType'])) {
         $_SESSION['error'] = "All field are required.";
@@ -211,16 +214,15 @@ try {
     return;
 }
 
-//Prepare graph
-// if(isset($_GET['displayType']) && strlen($_GET['displayType']) > 0) {
+// Prepare graph
+// Set display type
 if(checkParameter($_GET['displayType'])) {
     $displayType = $_GET['displayType'];
 } else {
-    unset($_SESSION['error']);
     $displayType = 'Device';
 }
 
-//Generate graph label
+// Generate graph label
 $labels = array();
 
 switch($displayType) {
@@ -265,19 +267,20 @@ switch($displayType) {
         break;
 }
 
+// Set display time
 if(isset($_GET['displayTime']) && strlen($_GET['displayTime']) > 0) {
     $displayTime = $_GET['displayTime'];
 } else {
     $displayTime = 'Day';
 }
 
-//Generate devices' power consumption
-//$numOfRow: every 10 minutes
+// Generate devices' power consumption
+// $numOfRow: every 10 minutes
 $numOfRow = 0;
 $timeFormat ='';
 setDisplayTime($displayTime, $numOfRow, $timeFormat);
 
-//Get each device's record
+// Get each device's record
 // Get average
 $avgs = array();
 foreach($devices as $device) {
@@ -445,23 +448,15 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
 <!-- Remove device -->
 <?php printRemoveDevice(); ?>
 
-<section id="diagram" <?php if($total == 0) {echo('hidden');} ?>>
+<!-- Print graph -->
+<section id="diagram">
 <!-- Select display type -->
-<ul id="selectDisplayType">
-    <li id="Device"><a href="device.php?displayType=Device&displayTime=<?=$displayTime?>">Device</a></li>
-    <li id="Type"><a href="device.php?displayType=Type&displayTime=<?=$displayTime?>">Type</a></li>
-    <li id="Location"><a href="device.php?displayType=Location&displayTime=<?=$displayTime?>">Location</a></li>
-</ul>
+<?php printDisplayTypeBar($displayTime, 'device.php?'); ?>
 
 <!-- Select display time -->
-<ul id="selectDisplayTime">
-    <li id="Day"><a href="device.php?displayType=<?=$displayType?>&displayTime=Day">Day</a></li>
-    <li id="Week"><a href="device.php?displayType=<?=$displayType?>&displayTime=Week">Week</a></li>
-    <li id="Month"><a href="device.php?displayType=<?=$displayType?>&displayTime=Month">Month</a></li>
-    <li id="Year"><a href="device.php?displayType=<?=$displayType?>&displayTime=Year">Year</a></li>
-</ul>
+<?php printDisplayTimeBar($displayType, 'device.php?'); ?>
 
-<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div id="chartContainer" style="height: 370px; width: 100%;" <?php if($total == 0) {echo('hidden');} ?>></div>
 <p><strong>Average Power Consumption in Past <?=$displayTime?>:</strong> <?=number_format($total, 2, '.', '')?>W</p>
 </section>
 

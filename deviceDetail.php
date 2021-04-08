@@ -10,6 +10,7 @@ accessDeny();
 
 //Check missing parameter
 if(!checkParameter($_GET['deviceIp']) || !checkParameter($_GET['deviceName'])) {
+    $_SESSION['error'] = "Missing parameter.";
     header('Location: device.php');
     return;
 }
@@ -54,7 +55,6 @@ try {
 //Add to other family
 if(isset($_POST['addToFamily'])) {
     if(!checkParameter($_POST['familyId'])) {
-        unset($_SESSION['error']);
         header('Location: deviceDetail.php?deviceName=' . $_GET['deviceName'] . '&deviceIp=' . $_GET['deviceIp']);
         return;
     } else {
@@ -140,7 +140,6 @@ try {
 if(checkParameter($_GET['displayTime'])) {
     $displayTime = $_GET['displayTime'];
 } else {
-    unset($_SESSION['error']);
     $displayTime = 'Day';
 }
 
@@ -148,7 +147,8 @@ if(checkParameter($_GET['displayTime'])) {
 $now = time();
 $numOfRow = 0;
 $timeFormat = '';
-setDisplayTime($displayTime, $numOfRow, $timeFormat);
+$subtitle = '';
+setDisplayTime($displayTime, $numOfRow, $timeFormat, $subtitle);
 $start = $now - $numOfRow * 10 * 60;
 
 //Get device record
@@ -192,25 +192,12 @@ try {
         $lastDataTime = strtotime(end($records)["time"]);
 
         //Add new data as 0
-        while($now > ($lastDataTime + (10 * 60))) {
-            array_push($records, array(
-                "device_id" => $records[0]["device_id"],
-                "time" => date('Y-m-d H:i:s',$lastDataTime + (10 * 60)),
-                "current" => 0,
-                "voltage" => 0
-            ));
-            $lastDataTime = strtotime(end($records)["time"]);
-        }
-        //Add old data as 0
-        while($start < ($firstDataTime - (10 * 60))) {
-            array_unshift($records, array(
-                "device_id" => $records[0]["device_id"],
-                "time" => date('Y-m-d H:i:s',$firstDataTime - (10 * 60)),
-                "current" => 0,
-                "voltage" => 0
-            ));
-            $firstDataTime = strtotime($records[0]["time"]);
-        }
+        addNewData($now, $lastDataTime, $records);
+        //Add old data as 0a($now, $lastDataTime, $records);
+        addOldData($start, $firstDataTime, $records);
+    } else {
+        $records = array();
+        addNewData($now, $start - (10 * 60), $records);
     }
 } catch(Throwable $e) {
     header('Location: error.php');
@@ -239,19 +226,15 @@ try {
                 switch($displayTime) {
                     case 'Day':
                         $count = 0; //Display every 10 minutes
-                        $subtitle = "Display every 10 minutes";
                         break;
                     case 'Week':
                         $count = ($count + 1) % 6; //Display every 1 hour
-                        $subtitle = "Display every 1 hour";
                         break;
                     case 'Month':
                         $count = ($count + 1) % (3 * 6); //Display every 3 hours
-                        $subtitle = "Display every 3 hours";
                         break;
                     case 'Year':
                         $count = ($count + 1) % (12 * 6); //Display every 12 hours
-                        $subtitle = "Display every 12 hours";
                         break;
                 }
             }
@@ -302,8 +285,9 @@ try {
 
 <main>
     <?php flashMessage(); ?>
+    <p><a href="device.php"><button>Return to Device</button></a></p>
 
-<section id="diagram" <?php if(!$records){echo('hidden');}?>>
+<section id="diagram">
 <!-- Change display type (hour, day, month, year) -->
 <ul>
 <li id="Day"><a href="deviceDetail.php?deviceName=<?=$_GET['deviceName']?>&deviceIp=<?=$_GET['deviceIp']?>&displayTime=Day">Day</a></li>
@@ -312,7 +296,7 @@ try {
 <li id="Year"><a href="deviceDetail.php?deviceName=<?=$_GET['deviceName']?>&deviceIp=<?=$_GET['deviceIp']?>&displayTime=Year">Year</a></li>
 </ul>
 
-<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div id="chartContainer" style="height: 370px; width: 100%;" <?php if(!$records){echo('hidden');}?>></div>
 
 <p><strong>Max. Power Consumption:</strong> <?=$max?>W&nbsp <strong>Avg. Power Consumption in Past <?=$displayTime?>:</strong> <?=number_format($avg, 2, '.', '')?>W</p>
 
@@ -320,7 +304,6 @@ try {
 
 <section id="detail">
     <p>Device Name: <?=$detail['name']?></p>
-    <!-- <p>Device ID: <?=$detail['id']?></p> -->
     <p>Device Type: <?=$type['name']?></p>
     <p>Device Location: <?=$location['name']?></p>
     <?php

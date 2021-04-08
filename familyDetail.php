@@ -8,6 +8,7 @@ accessDeny();
 
 // Check missing parameter
 if(!checkParameter($_GET['familyId']) || !checkParameter($_GET['familyName'])) {
+    $_SESSION['error'] = "Missing parameter.";
     header('Location: family.php');
     return;
 }
@@ -65,14 +66,14 @@ try {
         ':familyId' => $_GET['familyId'],
         ':familyName' => $_GET['familyName']
     ));
-    $detail = $stmt->fetch(PDO::FETCH_ASSOC);
+    $familyDetail = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Get admin name
     $stmt = $pdo->prepare('SELECT name FROM User WHERE id = :adminId');
-    $stmt->execute(array(':adminId' => $detail['admin']));
+    $stmt->execute(array(':adminId' => $familyDetail['admin']));
     $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $detail['adminName'] = $admin['name'];
+    $familyDetail['adminName'] = $admin['name'];
 } catch(Throuwable $e) {
     header('Location: error.php');
     return;
@@ -97,12 +98,149 @@ try {
     header('Location: error.php');
     return;
 }
+
+//Get family device detail
+try {
+    $details = array();
+    foreach($devices as $device) {
+        $stmt = $pdo->prepare('SELECT * FROM Device WHERE id = :deviceId');
+        $stmt->execute(array(':deviceId' => $device['device_id']));
+        $detail = $stmt->fetch(PDO::FETCH_ASSOC);
+        array_push($details, $detail);
+    }
+} catch(Throwable $e) {
+    header('Location: error.php');
+    return;
+}
+
+// Prepare graph
+// Set display type
+if(checkParameter($_GET['displayType'])) {
+    $displayType = $_GET['displayType'];
+} else {
+    $displayType = 'Device';
+}
+
+// Generate graph label
+$labels = array();
+
+switch($displayType) {
+    case 'Device':
+        foreach($details as $detail) {
+            if(!array_key_exists($detail['id'], $labels)) {
+                $labels[$detail['id']] = $detail['name'];
+            }
+        }
+        break;
+    case 'Type':
+        foreach($details as $detail) {
+            if(!array_key_exists($detail['type'], $labels)) {
+                try {
+                    $stmt = $pdo->prepare('SELECT name FROM Type WHERE id = :typeId');
+                    $stmt->execute(array(':typeId' => $detail['type']));
+                    $type = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    $labels[$detail['type']] = $type['name'];
+                } catch(Throwable $e) {
+                    header('Location: error.php');
+                    return;
+                }
+            }
+        }
+        break;
+    case 'Location':
+        foreach($details as $detail) {
+            if(!array_key_exists($detail['location'], $labels)) {
+                try {
+                    $stmt = $pdo->prepare('SELECT name FROM Location WHERE id = :locationId');
+                    $stmt->execute(array(':locationId' => $detail['location']));
+                    $location = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    $labels[$detail['location']] = $location['name'];
+                } catch(Throwable $e) {
+                    header('Location: error.php');
+                    return;
+                }                
+            }
+        }
+        break;
+}
+
+// Set display time
+if(isset($_GET['displayTime']) && strlen($_GET['displayTime']) > 0) {
+    $displayTime = $_GET['displayTime'];
+} else {
+    $displayTime = 'Day';
+}
+
+// Generate devices' power consumption
+// $numOfRow: every 10 minutes
+$numOfRow = 0;
+$timeFormat ='';
+setDisplayTime($displayTime, $numOfRow, $timeFormat);
+
+// Get each device's record
+// Get average
+$avgs = array();
+foreach($devices as $device) {
+    try {
+        $sql = 'SELECT * FROM Record WHERE device_id = :deviceId AND time >= DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 ' . $displayTime . ') ORDER BY time ASC';
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(array(':deviceId' => $device['device_id']));
+        $records = $stmt->fetchAll();
+    } catch(Throwable $e) {
+        header('Location: error.php');
+        return;
+    }     
+    
+    if($records) {
+        $sum = 0;
+    
+        foreach($records as $record) {
+            $sum += $record['current'] * $record['voltage'];
+        }
+        // $avg = $sum / count($records);
+        $avg = $sum / $numOfRow;
+    } else {
+        $avg = 0;
+    }
+    $avgs[$device['device_id']] = $avg;
+}
+
+//Generate $dataPoints for graph
+$dataPoints = array();
+$total = 0;
+setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $dataPoints);
+
 ?>
 
 <html lang='en'>
 <head>
     <meta charset='UTF-8'>
     <title>Family Detail</title>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script>
+        window.onload = function () {
+        
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                title:{
+                    text: "Average Power Consumption Per <?=$displayTime?> by <?=$displayType?>"
+                },
+                data: [{
+                    type: "pie",
+                    showInLegend: "true",
+                    legendText: "{label}",
+                    indexLabelFontSize: 16,
+                    indexLabel: "{label} - #percent%",
+                    yValueFormatString: "#W",
+                    dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>
+                }]
+            });
+            chart.render();
+        
+        }
+    </script>
 </head>
 <body>
 <header>
@@ -115,10 +253,22 @@ try {
 <!-- Remove device -->
 <?php printRemoveDevice(true); ?>
 
+<!-- Print graph -->
+<section id="diagram">
+<!-- Select display type -->
+<?php printDisplayTypeBar($displayTime, 'familyDetail.php?familyId=' . $_GET['familyId'] . '&familyName=' . $_GET['familyName'] . '&'); ?>
+
+<!-- Select display time -->
+<?php printDisplayTimeBar($displayType, 'familyDetail.php?familyId=' . $_GET['familyId'] . '&familyName=' . $_GET['familyName'] . '&'); ?>
+
+<div id="chartContainer" style="height: 370px; width: 100%;" <?php if($total == 0) {echo('hidden');} ?>></div>
+<p><strong>Average Power Consumption in Past <?=$displayTime?>:</strong> <?=number_format($total, 2, '.', '')?>W</p>
+</section>
+
 <!-- Display family detail -->
 <section id="detail">
-    <p>Family Name: <?=$detail['name']?></p>
-    <p>Family ID: <?=$detail['id']?></p>
+    <p>Family Name: <?=$familyDetail['name']?></p>
+    <p>Family ID: <?=$familyDetail['id']?></p>
     <p>Family Member: 
     <table>
     <?php
@@ -136,7 +286,7 @@ try {
         <tr>
             <th>Name</th>
             <?php
-                if(checkAdmin($detail['admin'])) {
+                if(checkAdmin($familyDetail['admin'])) {
                     echo('<th>Remove From Family</th>');
                 }
             ?>
@@ -149,7 +299,7 @@ try {
 
             echo('<tr>');
             echo('<td><a href="deviceDetail.php?deviceName=' . $deviceDetail['name'] . '&deviceIp=' . $deviceDetail['ip_address'] . '">' . $deviceDetail['name'] . '</a></td>');
-            if(checkAdmin($detail['admin'])) {
+            if(checkAdmin($familyDetail['admin'])) {
                 echo('<td><button onclick="remove(\'' . $deviceDetail['name'] . '\', \'' . $deviceDetail['id'] . '\', \'' . $deviceDetail['ip_address'] . '\')">-</button></td>');
             }
             echo('</tr>');
@@ -157,7 +307,7 @@ try {
     ?>
     </table>
     </p>
-    <p>Admin: <?=$detail['adminName']?></p>
+    <p>Admin: <?=$familyDetail['adminName']?></p>
 <section>
 </main>
 

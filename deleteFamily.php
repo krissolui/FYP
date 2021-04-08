@@ -8,6 +8,7 @@ accessDeny();
 
 //Check parameter
 if(!checkParameter($_GET['familyId'])) {
+    $_SESSION['error'] = "Missing parameter.";
     header('Location: family.php');
     return;
 }

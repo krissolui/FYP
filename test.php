@@ -1,5 +1,6 @@
 <?php
 require_once "pdo.php";
+require_once "function.php";
 define('TIMEZONE', 'HongKong');
 date_default_timezone_set(TIMEZONE);
 
@@ -93,16 +94,7 @@ if(isset($_POST['delete'])) {
 
 </head>
 <body>
-<?php
-    if(isset($_SESSION['error'])) {
-        echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
-        unset($_SESSION['error']);
-    }
-    if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
-        unset($_SESSION['success']);
-    }
-?>
+<?php flashMessage(); ?>
 
 <form method="post">
 <p>Device ID: <input type="text" name="deviceId"/></p>

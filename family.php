@@ -141,7 +141,7 @@ if(isset($_POST['removeFamily']) && isset($_POST['familyId'])) {
 try {
     $stmt = $pdo->prepare('SELECT * FROM FamilyMap WHERE user_id = :userId');
     $stmt->execute(array(':userId' => $_SESSION['userId']));
-    $family = $stmt->fetchAll();
+    $families = $stmt->fetchAll();
 } catch(Throwable $e) {
     header('Location: error.php');
     return;
@@ -150,8 +150,8 @@ try {
 
 <html lang='en'>
 <head>
-<meta charset='UTF-8'>
-<title><?=$_SESSION['account']?>'s Family</title>
+    <meta charset='UTF-8'>
+    <title><?=$_SESSION['account']?>'s Family</title>
 </head>
 <body>
 <header>
@@ -208,14 +208,14 @@ try {
         <th>Remove from Family</th>
     </tr>
     <?php
-        foreach($family as $fam) {
+        foreach($families as $family) {
             try {
                 $stmt = $pdo->prepare('SELECT * FROM Family WHERE id = :familyId');
-                $stmt->execute(array(':familyId' => $fam['family_id']));
+                $stmt->execute(array(':familyId' => $family['family_id']));
                 $familyDetail = $stmt->fetch(PDO::FETCH_ASSOC);
     
                 $stmt = $pdo->prepare('SELECT user_id FROM FamilyMap WHERE family_id = :familyId');
-                $stmt->execute(array(':familyId' => $fam['family_id']));
+                $stmt->execute(array(':familyId' => $family['family_id']));
                 $member = $stmt->fetchAll();
             } catch(Throwable $e) {
                 header('Location: error.php');

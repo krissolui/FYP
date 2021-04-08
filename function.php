@@ -51,10 +51,8 @@ function checkPasswordMatch($pw1, $pw2) {
 // Check parameter
 function checkParameter($para) {
     if(!isset($para)) {
-        $_SESSION['error'] = "Parameter missing.";
         return false;
     } else if(strlen($para) < 1) {
-        $_SESSION['error'] = "Invalid parameter.";
         return false;
     }
     return true;
@@ -63,10 +61,8 @@ function checkParameter($para) {
 // Check parameter: name
 function checkName() {
     if(!isset($_REQUEST['name'])) {
-        $_SESSION['error'] = "Parameter missing.";
         return false;
     } else if(strlen($_REQUEST['name']) < 1) {
-        $_SESSION['error'] = "Invalid parameter.";
         return false;
     }
     return true;
@@ -75,10 +71,8 @@ function checkName() {
 // Check parameter: email
 function checkEmail() {
     if(!isset($_REQUEST['email'])) {
-        $_SESSION['error'] = "Parameter missing.";
         return false;
     } else if(strlen($_REQUEST['email']) < 1) {
-        $_SESSION['error'] = "Invalid parameter.";
         return false;
     }
     return true;
@@ -87,98 +81,12 @@ function checkEmail() {
 // Check parameter: password
 function checkPassword() {
     if(!isset($_REQUEST['password'])) {
-        $_SESSION['error'] = "Parameter missing.";
         return false;
     } else if(strlen($_REQUEST['password']) < 1) {
-        $_SESSION['error'] = "Invalid parameter.";
         return false;
     }
     return true;
 }
-
-// // Check parameter: deviceId
-// function checkDeviceId() {
-//     if(!isset($_REQUEST['deviceId'])) {
-//         $_SESSION['error'] = "Parameter missing.";
-//         return false;
-//     } else if(strlen($_REQUEST['deviceId']) < 1) {
-//         $_SESSION['error'] = "Invalid parameter.";
-//         return false;
-//     }
-//     return true;
-// }
-
-// // Check parameter: deviceIp
-// function checkDeviceIp() {
-//     if(!isset($_REQUEST['deviceIp'])) {
-//         $_SESSION['error'] = "Parameter missing.";
-//         return false;
-//     } else if(strlen($_REQUEST['deviceIp']) < 1) {
-//         $_SESSION['error'] = "Invalid parameter.";
-//         return false;
-//     }
-//     return true;
-// }
-
-// // Check parameter: deviceName
-// function checkDeviceName() {
-//     if(!isset($_REQUEST['deviceName'])) {
-//         $_SESSION['error'] = "Parameter missing.";
-//         return false;
-//     } else if(strlen($_REQUEST['deviceName']) < 1) {
-//         $_SESSION['error'] = "Invalid parameter.";
-//         return false;
-//     }
-//     return true;
-// }
-
-// // Check parameter: deviceLocation
-// function checkDeviceLocation() {
-//     if(!isset($_REQUEST['deviceLocation'])) {
-//         $_SESSION['error'] = "Parameter missing.";
-//         return false;
-//     } else if(strlen($_REQUEST['deviceLocation']) < 1) {
-//         $_SESSION['error'] = "Invalid parameter.";
-//         return false;
-//     }
-//     return true;
-// }
-
-// // Check parameter: deviceType
-// function checkDeviceType() {
-//     if(!isset($_REQUEST['deviceType'])) {
-//         $_SESSION['error'] = "Parameter missing.";
-//         return false;
-//     } else if(strlen($_REQUEST['deviceType']) < 1) {
-//         $_SESSION['error'] = "Invalid parameter.";
-//         return false;
-//     }
-//     return true;
-// }
-
-// // Check parameter: familyId
-// function checkFamilyId() {
-//     if(!isset($_REQUEST['familyId'])) {
-//         $_SESSION['error'] = "Parameter missing.";
-//         return false;
-//     } else if(strlen($_REQUEST['familyId']) < 1) {
-//         $_SESSION['error'] = "Invalid parameter.";
-//         return false;
-//     }
-//     return true;
-// }
-
-// // Check parameter: familyName
-// function checkFamilyName() {
-//     if(!isset($_REQUEST['familyName'])) {
-//         $_SESSION['error'] = "Parameter missing.";
-//         return false;
-//     } else if(strlen($_REQUEST['familyName']) < 1) {
-//         $_SESSION['error'] = "Invalid parameter.";
-//         return false;
-//     }
-//     return true;
-// }
 
 // Check user is admin
 function checkAdmin($admin) {
@@ -352,23 +260,27 @@ function updateDeviceAdmin($pdo, $admin, $deviceId, $deviceIp, $userId) {
 }
 
 // Set displayTime
-function setDisplayTime($displayTime, &$numOfRow, &$timeFormat) {
+function setDisplayTime($displayTime, &$numOfRow, &$timeFormat, &$subtitle = null) {
     switch($displayTime) {
         case 'Day':
             $numOfRow = 24 * 6;
             $timeFormat = "hh:mm TT";
+            $subtitle = "Display every 10 minutes";
             return;
         case 'Week':
             $numOfRow = 7 * 24 * 6;
             $timeFormat = "D MMM hh TT";
+            $subtitle = "Display every 1 hour";
             return;
         case 'Month':
             $numOfRow = 30 * 24 * 6;
             $timeFormat = "D MMM hh TT";
+            $subtitle = "Display every 3 hours";
             return;
         case 'Year':
             $numOfRow = 365 * 24 * 6;
             $timeFormat = "D MMM YYYY hh TT";
+            $subtitle = "Display every 12 hours";
             return;
     }
     return;
@@ -559,6 +471,59 @@ function printRemoveDevice($family = false) {
         </div>
         </section>
         ');
+    return;
+}
+
+// Print select displayType bar
+function printDisplayTypeBar($displayTime, $page) {
+    echo('
+    <ul id="selectDisplayType">
+    <li id="Device"><a href="' . $page . 'displayType=Device&displayTime=' . $displayTime . '">Device</a></li>
+    <li id="Type"><a href="' . $page . 'displayType=Type&displayTime=' . $displayTime . '">Type</a></li>
+    <li id="Location"><a href="' . $page . 'displayType=Location&displayTime=' . $displayTime . '">Location</a></li>
+    </ul>
+    ');
+    return;
+}
+
+// Print select displayTime bar
+function printDisplayTimeBar($displayType, $page) {
+    echo('
+    <ul id="selectDisplayTime">
+    <li id="Day"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Day">Day</a></li>
+    <li id="Week"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Week">Week</a></li>
+    <li id="Month"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Month">Month</a></li>
+    <li id="Year"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Year">Year</a></li>
+    </ul>
+    ');
+    return;
+}
+
+// Add data in the past = 0
+function addOldData($start, $firstDataTime, &$records) {
+    while($start < ($firstDataTime - (10 * 60))) {
+        array_unshift($records, array(
+            "device_id" => $records[0]["device_id"],
+            "time" => date('Y-m-d H:i:s',$firstDataTime - (10 * 60)),
+            "current" => 0,
+            "voltage" => 0
+        ));
+        $firstDataTime = strtotime($records[0]["time"]);
+    }
+    return;
+}
+
+// Add data to present = 0
+function addNewData($now, $lastDataTime, &$records) {
+    while($now > ($lastDataTime + (10 * 60))) {
+        array_push($records, array(
+            "device_id" => $records[0]["device_id"],
+            "time" => date('Y-m-d H:i:s',$lastDataTime + (10 * 60)),
+            "current" => 0,
+            "voltage" => 0
+        ));
+        $lastDataTime = strtotime(end($records)["time"]);
+    }
     return;
 }
 ?>

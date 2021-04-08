@@ -8,6 +8,7 @@ accessDeny();
 
 //Check parameter
 if(!checkParameter($_GET['deviceId']) || !checkParameter($_GET['deviceIp'])) {
+    $_SESSION['error'] = "Missing parameter.";
     header('Location: device.php');
     return;
 }
@@ -80,16 +81,7 @@ if(isset($_POST['deleteDevice'])) {
 </header>
 
 <main>
-<?php
-    if(isset($_SESSION['error'])) {
-        echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
-        unset($_SESSION['error']);
-    }
-    if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
-        unset($_SESSION['success']);
-    }
-?>
+<?php flashMessage(); ?>
 
 <!-- Ask if delete device -->
 <p>You are the admin of the device. Do you want to delete the device?<p>

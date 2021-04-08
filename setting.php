@@ -81,7 +81,6 @@ if(isset($_POST['changePassword'])) {
             } else {
                 updateUserPassword($pdo, $newPw, $_SESSION['userId'], $detail['email']);
 
-                unset($_SESSION['error']);
                 $_SESSION['success'] = "Password updated.";
                 header('Location: setting.php');
                 return;

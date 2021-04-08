@@ -152,6 +152,7 @@ try {
 <head>
     <meta charset='UTF-8'>
     <title><?=$_SESSION['account']?>'s Family</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <header>

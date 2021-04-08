@@ -94,6 +94,7 @@ try {
 <head>
 <meta charset='UTF-8'>
 <title>Delete Family?</title>
+<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <header>

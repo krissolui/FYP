@@ -318,6 +318,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
 <head>
     <meta charset='UTF-8'>
     <title><?=$_SESSION['account']?>'s Device</title>
+    <link rel="stylesheet" href="css/main.css">
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script>
         window.onload = function () {

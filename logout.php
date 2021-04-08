@@ -22,6 +22,7 @@ if(isset($_POST['logout'])) {
 <head>
     <meta charset='UTF-8'>
     <title>Log Out</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
     <h1>Do You Want To Log Out?</h1>

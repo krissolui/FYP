@@ -9,6 +9,7 @@ session_start();
 <head>
     <meta charset='UTF-8'>
     <title>Error Page</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <header>

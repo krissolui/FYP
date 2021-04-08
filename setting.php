@@ -98,6 +98,7 @@ if(isset($_POST['changePassword'])) {
 <head>
     <meta charset='UTF-8'>
     <title>My Profile</title>
+    <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <header>

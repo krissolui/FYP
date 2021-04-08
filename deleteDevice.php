@@ -74,6 +74,7 @@ if(isset($_POST['deleteDevice'])) {
 <head>
 <meta charset='UTF-8'>
 <title>Delete Device?</title>
+<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <header>

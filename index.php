@@ -10,6 +10,7 @@ session_start();
 <head>
 <meta charset='UTF-8'>
 <title>Smart Power Tracker</title>
+<link rel="stylesheet" href="css/main.css">
 </head>
 <body>
 <header>

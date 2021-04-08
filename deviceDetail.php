@@ -209,6 +209,7 @@ try {
 <head>
     <meta charset='UTF-8'>
     <title>Device Detail</title>
+    <link rel="stylesheet" href="css/main.css">
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script type="text/javascript">
         window.onload = function () {

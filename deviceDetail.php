@@ -285,7 +285,7 @@ try {
 
 <main>
     <?php flashMessage(); ?>
-    <p><a href="device.php"><button>Return to Device</button></a></p>
+    <p><a href="device.php"><button>Return to My Device</button></a></p>
 
 <section id="diagram">
 <!-- Change display type (hour, day, month, year) -->

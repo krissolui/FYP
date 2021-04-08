@@ -250,6 +250,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
 
 <main>
 <?php flashMessage(); ?>
+<p><a href="family.php"><button>Return to My Family</button></a></p>
 <!-- Remove device -->
 <?php printRemoveDevice(true); ?>
 

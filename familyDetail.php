@@ -269,7 +269,6 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
 <!-- Display family detail -->
 <section id="detail">
     <p>Family Name: <?=$familyDetail['name']?></p>
-    <p>Family ID: <?=$familyDetail['id']?></p>
     <p>Family Member: 
     <table>
     <?php

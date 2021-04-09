@@ -102,17 +102,23 @@ if(isset($_POST['changePassword'])) {
 </head>
 <body>
 <header>
-    <h1>My Profile</h1>
-    <?php printTitleBar('setting'); ?>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+    <?php printMainMenu('setting'); ?>
 </header>
 
-<main> 
+<main class="setting-page"> 
+<section class="head-image">
+    <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+    <h1 class="title subtitle"><?=$_SESSION['account']?> Profile</h1>
+</section>
 <?php flashMessage(); ?>
 
-<section id="current setting">
+<section id="current-setting">
     <p>Name: <?=$detail['name']?></p>
     <p>Email: <?=$detail['email']?></p>
-    <p><button onclick="toggleVisibility('edit', false)">Edit</button>
+    <p id="settingBtns"><button onclick="toggleVisibility('edit', false)">Edit</button>
     <button onclick="toggleVisibility('changePassword', false)">Change My Password</button></p>
 </section>
 
@@ -121,7 +127,7 @@ if(isset($_POST['changePassword'])) {
     <form method="post">
         <p>Name: <input type="text" name="name" value="<?=$detail['name']?>"/></p>
         <p>Email: <input type="email" name="email" value="<?=$detail['email']?>"/></p>
-        <p><input type="submit" name="edit" value="Submit"/></p>
+        <p><input type="submit" name="edit" value="Submit" class="submitBtn"/></p>
     </form>
 </section>
 
@@ -132,11 +138,12 @@ if(isset($_POST['changePassword'])) {
         <p>New Password: <input type="password" name="newPassword" class="password"/>
         <span style="color: red">^6-20 characters</span></p>
         <p>Confirm New Password: <input type="password" name="newPassword2" class="password"/></p>
-        <p><input type="checkbox" onclick="togglePasswordVisibility('password')">Show Password</p>
-        <p><input type="submit" name="changePassword" value="Submit"/></p>
+        <p><input type="checkbox" onclick="togglePasswordVisibility('password')"> Show Password</p>
+        <p><input type="submit" name="changePassword" value="Submit" class="submitBtn"/></p>
     </form>
 </section>
 
+</main>
 <script>
     function toggleVisibility(id, reverse) {
         var element = document.getElementById(id);
@@ -172,6 +179,6 @@ if(isset($_POST['changePassword'])) {
         }
     }
 </script>
-</main>
+<script src="js/main.js"></script>
 </body>
 </html>

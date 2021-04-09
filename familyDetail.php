@@ -245,33 +245,40 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
 </head>
 <body>
 <header>
-    <h1>Family Detail</h1>
-    <?php printTitleBar('family'); ?>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+    <?php printMainMenu('family'); ?>
 </header>
 
-<main>
+<main class="familyDetail-page">
+    <section class="head-image">
+        <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+        <h1 class="title subtitle">Family Detail</h1>
+    </section>
 <?php flashMessage(); ?>
-<p><a href="family.php"><button>Return to My Family</button></a></p>
-<!-- Remove device -->
-<?php printRemoveDevice(true); ?>
+<div class="returnBtn"><a href="family.php"><button>Return to My Family</button></a></div>
 
 <!-- Print graph -->
 <section id="diagram">
 <!-- Select display type -->
-<?php printDisplayTypeBar($displayTime, 'familyDetail.php?familyId=' . $_GET['familyId'] . '&familyName=' . $_GET['familyName'] . '&'); ?>
+<?php printDisplayTypeMenu($displayType, $displayTime, 'familyDetail.php?familyId=' . $_GET['familyId'] . '&familyName=' . $_GET['familyName'] . '&'); ?>
 
 <!-- Select display time -->
-<?php printDisplayTimeBar($displayType, 'familyDetail.php?familyId=' . $_GET['familyId'] . '&familyName=' . $_GET['familyName'] . '&'); ?>
+<?php printDisplayTimeMenu($displayType, $displayTime, 'familyDetail.php?familyId=' . $_GET['familyId'] . '&familyName=' . $_GET['familyName'] . '&'); ?>
 
 <div id="chartContainer" style="height: 370px; width: 100%;" <?php if($total == 0) {echo('hidden');} ?>></div>
 <p><strong>Average Power Consumption in Past <?=$displayTime?>:</strong> <?=number_format($total, 2, '.', '')?>W</p>
 </section>
 
+<!-- Remove device -->
+<?php printRemoveDevice(true); ?>
+
 <!-- Display family detail -->
 <section id="detail">
     <p>Family Name: <?=$familyDetail['name']?></p>
-    <p>Family Member: 
-    <table>
+    <p>Family Member: </p>
+    <table class="family-members">
     <?php
         foreach($member as $mem) {
             $stmt = $pdo->prepare('SELECT name FROM User WHERE id = :memId');
@@ -281,8 +288,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
         }
     ?>
     </table>
-    </p>
-    <p>Family Devices:
+    <p>Family Devices:</p>
     <table>
         <tr>
             <th>Name</th>
@@ -307,7 +313,6 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
         }
     ?>
     </table>
-    </p>
     <p>Admin: <?=$familyDetail['adminName']?></p>
 <section>
 </main>
@@ -351,5 +356,6 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
         }
     }
 </script>
+<script src="js/main.js"></script>
 </body>
 </html>

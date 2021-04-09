@@ -1,0 +1,33 @@
+.head-image {
+    position: relative;
+    height: 40vh;
+    width: 100vw;
+    background: 
+    linear-gradient(
+      to right,
+      rgba($primary-color, 0.4),
+      rgba($primary-color, 0.2)
+    ),
+    url('../img/solar_panel.jpg') center center;
+    background-size: cover;
+
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 0.5rem;
+
+    .title {
+        text-align: center;
+        font-weight: 500;
+        font-size: 2rem;
+        padding: 0.5rem 0 0.5rem 0;
+        color: set-text-color($primary-color);
+        text-shadow: 0 0 4px $primary-color;
+        text-transform: uppercase;
+    }
+    
+    .subtitle {
+        font-size: 1.5rem;
+    }
+}

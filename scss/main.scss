@@ -1,7 +1,51 @@
 @import 'config';
+@import 'menu';
+@import 'head-image';
+@import 'table';
+@import 'home';
+@import 'device';
+@import 'family';
+@import 'setting';
+@import 'contact';
+@import 'log';
+@import 'graph';
+@import 'responsive';
 
 body {
+    background: $primary-color;
     height: 100vh;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1;
+    font-size: $font-size;
+    color: set-text-color($primary-color);
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+}
+
+a {
+    text-decoration: none;
+}
+
+header {
+    position: fixed;
+    z-index: 2;
+    width: 100%;
+    padding: 1rem;
+}
+
+ul {
+    a {
+        color: set-text-color($primary-color);
+    }
+    .page {
+        color: $secondary-color;
+    }
+
+}
+
+.flashMessage {
+    position: relative;
+    top: 0.5rem;
+    left: 0.5rem;
 }

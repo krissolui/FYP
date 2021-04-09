@@ -1,0 +1,40 @@
+table {
+    border: solid 2px $third-color;
+    align-self: center;
+
+    td, th {
+        border: solid 2px $third-color;
+        text-align: center;
+        padding: 3px 1rem;
+    }
+
+    th {
+        font-size: 1.5rem;
+        font-weight: 400;
+    }
+
+    td {
+        font-size: 1rem;
+        color: $third-color;
+
+        a {
+            color: $third-color;
+            font-size: 1.2rem;
+            padding: 3px 1rem;
+
+            &:hover {
+                color: $secondary-color;
+            }
+        }
+    }
+
+    button {
+        background-color: $third-color;
+        color: set-text-color($third-color);
+        font-size: 1.2rem;
+        padding: 3px 12px;
+        border: none;
+        border-radius: 4px;
+        box-shadow: 2px 2px 3px $third-color;
+    }
+}

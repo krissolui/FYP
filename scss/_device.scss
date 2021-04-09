@@ -1,0 +1,115 @@
+.device-page {
+    display:flex;
+    flex-flow: column wrap;
+    align-items: stretch;
+    // justify-content: center;
+
+    // #diagram {
+    //     p {
+    //         text-align: center;
+    //         margin: 1rem 0;
+    //     }
+    // }
+
+    #add, #remove {
+        margin: 1rem 20vw;
+        padding: 0 1rem;
+        border: 5px solid $third-color;
+
+        p, h3 {
+            margin: 1rem 0;
+        }
+
+        button, .submitBtn {
+            width: 100%;
+            background-color: $third-color;
+            color: set-text-color($third-color);
+            border: none;
+            border-radius: 4px;
+            box-shadow: 2px 2px 3px $third-color;
+            font-size: 1.2rem;
+            padding: 2px auto;
+        }
+    }
+
+    #removeBtns {
+        display: flex;
+        flex-flow: row wrap;
+        button, .submitBtn {
+            width: 45%;
+            margin: 0 auto;
+            
+        }
+    }
+}
+
+.deviceDetail-page {
+    display:flex;
+    flex-flow: column wrap;
+    align-items: stretch;
+    button, .submitBtn {
+        background-color: $third-color;
+        color: set-text-color($third-color);
+        border: none;
+        border-radius: 4px;
+        box-shadow: 2px 2px 3px $third-color;
+        font-size: 1.2rem;
+    }
+
+    #detail {
+        margin: 1rem 30vw;
+
+        p, h3 {
+            margin: 1rem 0;
+        }
+
+        .submitBtn {
+            font-size: 1rem;
+            width: auto;
+            padding: 2px 1rem;
+        }
+    }
+}
+
+.deleteDevice-page {
+    #delete, #admin {
+        margin: 1rem 30vw;
+    }
+
+    p, h3 {
+        margin: 1rem 0;
+    }
+
+    .removeBtns {
+        display: flex;
+        flex-flow: row wrap;
+        button, .submitBtn {
+            width: 45%;
+            margin: 0.5rem auto;
+            background-color: $third-color;
+            color: set-text-color($third-color);
+            border: none;
+            border-radius: 4px;
+            box-shadow: 2px 2px 3px $third-color;
+            font-size: 1.2rem;
+            padding: 2px auto;
+        }
+
+    }
+
+}
+
+.returnBtn {
+    button {
+        position: relative;
+        top: 0.5rem;
+        left: 0.5rem;
+        width: 30vw;
+        background-color: $third-color;
+        color: set-text-color($third-color);
+        border: none;
+        border-radius: 4px;
+        box-shadow: 2px 2px 3px $third-color;
+        font-size: 1.2rem;
+    }
+}

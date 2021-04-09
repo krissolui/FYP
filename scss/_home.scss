@@ -1,0 +1,12 @@
+.home-page {
+    .head-image {
+        height: 100vh;
+        justify-content: center;
+
+        hr {
+            width: 95%;
+            border-top: 1px solid set-text-color($primary-color);
+            border-bottom: 1px solid set-text-color($primary-color);
+        }
+    }
+}

@@ -78,17 +78,21 @@ if(isset($_POST['deleteDevice'])) {
 </head>
 <body>
 <header>
-    <h1>Delete Device?</h1>
 </header>
-
-<main>
+    
+<main class="deleteDevice-page">
+<section class="head-image">
+    <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+    <h1 class="title subtitle">Delete Device?</h1>
+</section>
 <?php flashMessage(); ?>
 
 <!-- Ask if delete device -->
+<section id="delete">
 <p>You are the admin of the device. Do you want to delete the device?<p>
 <p style="color: orange">*Cautious: All device records will be deleted.</p>
 <form method="post">
-<div><input type="submit" name="deleteDevice" value="Yes"/></div>
+<div class="removeBtns"><input type="submit" name="deleteDevice" value="Yes" class="submitBtn"/>
 <?php
     try {
         $stmt = $pdo->prepare('SELECT * FROM DeviceMap WHERE device_id = :deviceId AND user_id <> :userId AND family_id IS NULL ORDER BY rank');
@@ -99,15 +103,17 @@ if(isset($_POST['deleteDevice'])) {
         $row = $stmt->fetchAll();
 
         if($row) {
-            echo('</form><div><button onclick="toggleVisibility(\'admin\')">No</button></div>');
+            echo('</div></form><div class="removeBtns"><button onclick="toggleVisibility(\'admin\')">No</button></div>');
         } else {
-            echo('<div><input type="submit" name="return" value="No"/></div></form>');
+            echo('<input type="submit" name="return" value="No" class="submitBtn"/></div></form>');
         }
     } catch(Throwable $e) {
         header('error.php');
         return;
     }
 ?>
+
+</section>
 
 <!-- Ask to change admin -->
 <section id="admin" hidden>
@@ -125,8 +131,8 @@ if(isset($_POST['deleteDevice'])) {
         }
     ?>
 </select></p>
-<p><input type="submit" name="changeAdmin" value="Submit"/>
-<input type="submit" name="returnDevice" value="Cancel"></p>
+<p class="removeBtns"><input type="submit" name="changeAdmin" value="Submit" class="submitBtn"/>
+<input type="submit" name="returnDevice" value="Cancel" class="submitBtn"></p>
 </form>
 </section>
 
@@ -140,5 +146,6 @@ function toggleVisibility(id) {
     }
 }
 </script>
+<script src="js/main.js"></script>
 </main>
 </html>

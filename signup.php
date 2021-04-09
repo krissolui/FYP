@@ -75,11 +75,17 @@ session_start();
 </head>
 <body>
     <header>
-        <h1>Please Sign Up</h1>
-        <?php printTitleBar('signup'); ?>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+        <?php printMainMenu('signup'); ?>
     </header>
-
-    <main>
+    
+    <main class="signup-page">
+        <section class="head-image">
+            <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+            <h1 class="title subtitle">Please Sign Up</h1>
+        </section>
         <?php flashMessage(); ?>
         <form method="post">
             <p>First Name: <input type="text" name="firstName"/></p>
@@ -88,10 +94,11 @@ session_start();
             <p>Password: <input type="password" name="password"/>
             <span style="color: red">^6-20 characters</span></p>
             <p>Confirm Password: <input type="password" name="password2"/></p>
-            <p><input type="submit" name="signUp" value="Sign Up"/>&nbsp
-            <input type='submit' name='cancel' value='Cancel'/></p>
+            <p class="submitBtns"><input type="submit" name="signUp" value="Sign Up" class="submitBtn"/>&nbsp
+            <input type='submit' name='cancel' value='Cancel' class="submitBtn"/></p>
         </form>
         <p style="color: red">* All fields are required!</p>
     </main>
+    <script src="js/main.js"></script>
 </body>
 </html>

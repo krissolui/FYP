@@ -1,0 +1,10 @@
+.contact-page {
+    display:flex;
+    flex-flow: column wrap;
+    align-items: center;
+    justify-content: center;
+
+    p, h3 {
+        margin: 1rem 0;
+    }
+}

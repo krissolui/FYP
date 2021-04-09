@@ -29,7 +29,7 @@ if(isset($_POST['login'])) {
             //Check password if account found
             if($pw === $row['password']) {
                 //Password correct
-                $_SESSION['success'] = 'Welcome back ' . $row['name'] . '!';
+                // $_SESSION['success'] = 'Welcome back ' . $row['name'] . '!';
                 $_SESSION['account'] = $row['name'];
                 $_SESSION['userId'] = $row['id'];
                 header('Location: index.php');
@@ -55,19 +55,28 @@ if(isset($_POST['login'])) {
 </head>
 <body>
     <header>
-        <h1>Please Login</h1>
-        <?php printTitleBar('login'); ?>
-    </header>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+    <?php printMainMenu('login'); ?>
+</header>
 
-    <main>
+<main class="login-page">
+    <section class="head-image">
+        <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+        <h1 class="title subtitle">Please Login</h1>
+    </section>
         <?php flashMessage(); ?>
+    <section class="login">
         <form method="post">
             <p>Email: <input type="email" name="email" value="<?= $_SESSION['email']?>"/></p>
             <p>Password: <input type="password" name="password" id="password"/></p>
-            <p><input type="checkbox" onclick="toggleVisibility()">Show Password</p>
-            <p><input type="submit" name="login" value="Login"/>&nbsp
-            <input type='submit' name='cancel' value='Cancel'/></p>
+            <p><input type="checkbox" onclick="toggleVisibility()"> Show Password</p>
+            <p class="submitBtns"><input type="submit" name="login" value="Login" class="submitBtn"/>&nbsp
+            <input type='submit' name='cancel' value='Cancel' class="submitBtn"/></p>
         </form>
+
+    </section>
     </main>
 
     <script>
@@ -80,5 +89,6 @@ if(isset($_POST['login'])) {
         }
     }
     </script>
+    <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,47 @@
+.setting-page {
+    p, h3 {
+        margin: 1rem 0;
+        // text-align: center;
+    }
+
+    #current-setting {
+        margin: 1rem 30vw;
+        p {
+            text-align: center;
+        }
+
+        #settingBtns {
+            display: flex;
+            flex-flow: row wrap;
+            button, .submitBtn {
+                width: 45%;
+                margin: 0 auto;
+                background-color: $third-color;
+                color: set-text-color($third-color);
+                border: none;
+                border-radius: 4px;
+                box-shadow: 2px 2px 3px $third-color;
+                font-size: 1.2rem;
+                padding: 2px auto;
+                
+            }
+        }
+    }
+
+    #edit, #changePassword {
+        margin: 1rem 20vw;
+        padding: 0 1rem;
+        border: 5px solid $third-color;
+
+        button, .submitBtn {
+            width: 100%;
+            background-color: $third-color;
+            color: set-text-color($third-color);
+            border: none;
+            border-radius: 4px;
+            box-shadow: 2px 2px 3px $third-color;
+            font-size: 1.2rem;
+            padding: 2px auto;
+        }
+    }
+}

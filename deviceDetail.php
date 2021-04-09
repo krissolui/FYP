@@ -280,22 +280,23 @@ try {
 </head>
 <body>
 <header>
-    <h1>Device Detail</h1>
-    <?php printTitleBar('device'); ?>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+    <?php printMainMenu('device'); ?>
 </header>
 
-<main>
+<main class="deviceDetail-page">
+    <section class="head-image">
+        <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+        <h1 class="title subtitle">Device Detail</h1>
+    </section>
     <?php flashMessage(); ?>
-    <p><a href="device.php"><button>Return to My Device</button></a></p>
+    <div class="returnBtn"><a href="device.php"><button>Return to My Device</button></a></div>
 
 <section id="diagram">
 <!-- Change display type (hour, day, month, year) -->
-<ul>
-<li id="Day"><a href="deviceDetail.php?deviceName=<?=$_GET['deviceName']?>&deviceIp=<?=$_GET['deviceIp']?>&displayTime=Day">Day</a></li>
-<li id="Week"><a href="deviceDetail.php?deviceName=<?=$_GET['deviceName']?>&deviceIp=<?=$_GET['deviceIp']?>&displayTime=Week">Week</a></li>
-<li id="Month"><a href="deviceDetail.php?deviceName=<?=$_GET['deviceName']?>&deviceIp=<?=$_GET['deviceIp']?>&displayTime=Month">Month</a></li>
-<li id="Year"><a href="deviceDetail.php?deviceName=<?=$_GET['deviceName']?>&deviceIp=<?=$_GET['deviceIp']?>&displayTime=Year">Year</a></li>
-</ul>
+<?php printDisplayTimeMenu('Device', $displayTime, 'deviceDetail.php?deviceName=' . $_GET['deviceName'] . '&deviceIp=' . $_GET['deviceIp'] . '&'); ?>
 
 <div id="chartContainer" style="height: 370px; width: 100%;" <?php if(!$records){echo('hidden');}?>></div>
 
@@ -313,7 +314,6 @@ try {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         echo('<p>Admin: ' . $row['name'] . '</p>');
     ?>
-</section>
 
 <section id="addToFamily" <?php if(!$connect || count($list) < 1){echo('hidden');}?>>
     <form method="post">
@@ -334,11 +334,13 @@ try {
                     }
                 ?>
             </select>
-            <input type="submit" name="addToFamily" value="Submit"/>
+            <input type="submit" name="addToFamily" value="Submit" class="submitBtn"/>
         </p>
     </form>
 </section>
+</section>
 
 </main>
+<script src="js/main.js"></script>
 </body>
 </html>

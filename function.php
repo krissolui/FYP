@@ -14,11 +14,11 @@ function accessDeny() {
 // Print error message or success message
 function flashMessage() {
     if(isset($_SESSION['error'])) {
-        echo('<p style="color: red">' . $_SESSION['error'] . '</p>');
+        echo('<p style="color: red" class="flashMessage">' . $_SESSION['error'] . '</p>');
         unset($_SESSION['error']);
     }
     if(isset($_SESSION['success'])) {
-        echo('<p style="color: green">' . $_SESSION['success'] . '</p>');
+        echo('<p style="color: green" class="flashMessage">' . $_SESSION['success'] . '</p>');
         unset($_SESSION['success']);
     }
 }
@@ -340,113 +340,121 @@ function setPieDataPoints($displayType, $devices, $details, $labels, $avgs, &$to
 }
 
 // Print main title bar
-function printTitleBar($page = null) {
-    echo('<ul id="selectPage">');
+function printMainMenu($page = null) {
+    echo('<nav class="nav"><ul id="selectPage" class="menu-nav">');
     switch ($page) {
         case 'home':
             echo('
-            <li id="page"><a href="index.php">Home</a></li>
-            <li><a href="family.php">My Family</a></li>
-            <li><a href="device.php">My Device</a></li>
-            <li><a href="setting.php">Profile Setting</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="logout.php">Log Out</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="family.php">Family</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="device.php">Device</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="setting.php">Profile Setting</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="logout.php">Log Out</a></li>
             ');
             break;
         case 'family':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li id="page"><a href="family.php">My Family</a></li>
-            <li><a href="device.php">My Device</a></li>
-            <li><a href="setting.php">Profile Setting</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="logout.php">Log Out</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="family.php">Family</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="device.php">Device</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="setting.php">Profile Setting</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="logout.php">Log Out</a></li>
             ');
             break;
         case 'device':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li><a href="family.php">My Family</a></li>
-            <li id="page"><a href="device.php">My Device</a></li>
-            <li><a href="setting.php">Profile Setting</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="logout.php">Log Out</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="family.php">Family</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="device.php">Device</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="setting.php">Profile Setting</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="logout.php">Log Out</a></li>
             ');
             break;
         case 'setting':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li><a href="family.php">My Family</a></li>
-            <li><a href="device.php">My Device</a></li>
-            <li id="page"><a href="setting.php">Profile Setting</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="logout.php">Log Out</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="family.php">Family</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="device.php">Device</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="setting.php">Profile Setting</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="logout.php">Log Out</a></li>
             ');
             break;
         case 'contact':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li><a href="family.php">My Family</a></li>
-            <li><a href="device.php">My Device</a></li>
-            <li><a href="setting.php">Profile Setting</a></li>
-            <li id="page"><a href="contact.php">Contact Us</a></li>
-            <li><a href="logout.php">Log Out</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="family.php">Family</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="device.php">Device</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="setting.php">Profile Setting</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="logout.php">Log Out</a></li>
             ');
             break;
         case 'logout':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li><a href="family.php">My Family</a></li>
-            <li><a href="device.php">My Device</a></li>
-            <li><a href="setting.php">Profile Setting</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li id="page"><a href="logout.php">Log Out</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="family.php">Family</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="device.php">Device</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="setting.php">Profile Setting</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="logout.php">Log Out</a></li>
+            ');
+            break;
+        case 'unlog':
+            echo('
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="login.php">Login</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="signup.php">Sign Up</a></li>
             ');
             break;
         case 'unlogHome':
             echo('
-            <li id="page"><a href="index.php">Home</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="login.php">Login</a></li>
-            <li><a href="signup.php">Sign Up</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="login.php">Login</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="signup.php">Sign Up</a></li>
             ');
             break;
         case 'unlogContact':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li id="page"><a href="contact.php">Contact Us</a></li>
-            <li><a href="login.php">Login</a></li>
-            <li><a href="signup.php">Sign Up</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="login.php">Login</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="signup.php">Sign Up</a></li>
             ');
             break;
         case 'login':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li id="page"><a href="login.php">Login</a></li>
-            <li><a href="signup.php">Sign Up</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="login.php">Login</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="signup.php">Sign Up</a></li>
             ');
             break;
         case 'signup':
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="login.php">Login</a></li>
-            <li id="page"><a href="signup.php">Sign Up</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="login.php">Login</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link page" href="signup.php">Sign Up</a></li>
             ');
             break;
         default:
             echo('
-            <li><a href="index.php">Home</a></li>
-            <li><a href="family.php">My Family</a></li>
-            <li><a href="device.php">My Device</a></li>
-            <li><a href="setting.php">Profile Setting</a></li>
-            <li><a href="contact.php">Contact Us</a></li>
-            <li><a href="logout.php">Log Out</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="index.php">Home</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="family.php">Family</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="device.php">Device</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="setting.php">Profile Setting</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="contact.php">Contact Us</a></li>
+            <li class="menu-nav__item"><a class="menu-nav__link" href="logout.php">Log Out</a></li>
             ');
             break;
     }
-    echo('</ul>');
+    echo('</ul></nav>');
 }
 
 // Print remove device
@@ -465,7 +473,7 @@ function printRemoveDevice($family = false) {
         <input type="hidden" name="deviceName" value="" id="deviceName"/>
         <input type="hidden" name="deviceId" value="" id="deviceId"/>
         <input type="hidden" name="deviceIp" value="" id="deviceIp"/>
-        <p><input type="submit" name="removeDevice" value="Yes"/>
+        <p id="removeBtns"><input type="submit" name="removeDevice" value="Yes" class="submitBtn"/>
         <button onclick="toggleVisibility("remove")">No</button></p>
         </form>
         </div>
@@ -475,26 +483,32 @@ function printRemoveDevice($family = false) {
 }
 
 // Print select displayType bar
-function printDisplayTypeBar($displayTime, $page) {
+function printDisplayTypeMenu($displayType, $displayTime, $page) {
     echo('
-    <ul id="selectDisplayType">
-    <li id="Device"><a href="' . $page . 'displayType=Device&displayTime=' . $displayTime . '">Device</a></li>
-    <li id="Type"><a href="' . $page . 'displayType=Type&displayTime=' . $displayTime . '">Type</a></li>
-    <li id="Location"><a href="' . $page . 'displayType=Location&displayTime=' . $displayTime . '">Location</a></li>
+    <section class="nav-graph">
+    <ul id="selectDisplayType" class="menu-graph">
+    <li class="menu-graph__item"><a href="' . $page . 'displayType=Device&displayTime=' . $displayTime . '" class="menu-graph__link displayType__link" id="Device">Device</a></li>
+    <li class="menu-graph__item"><a href="' . $page . 'displayType=Type&displayTime=' . $displayTime . '" class="menu-graph__link displayType__link" id="Type">Type</a></li>
+    <li class="menu-graph__item"><a href="' . $page . 'displayType=Location&displayTime=' . $displayTime . '" class="menu-graph__link displayType__link" id="Location">Location</a></li>
     </ul>
+    </section>
     ');
     return;
 }
 
 // Print select displayTime bar
-function printDisplayTimeBar($displayType, $page) {
+function printDisplayTimeMenu($displayType = 'Device', $displayTime, $page) {
     echo('
-    <ul id="selectDisplayTime">
-    <li id="Day"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Day">Day</a></li>
-    <li id="Week"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Week">Week</a></li>
-    <li id="Month"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Month">Month</a></li>
-    <li id="Year"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Year">Year</a></li>
+    <section class="nav-graph">
+    <ul id="selectDisplayTime" class="menu-graph">
+    <li class="menu-graph__item"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Day" class="menu-graph__link displayTime__link" id="Day" >Day</a></li>
+    <li class="menu-graph__item"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Week" class="menu-graph__link displayTime__link" id="Week">Week</a></li>
+    <li class="menu-graph__item"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Month" class="menu-graph__link displayTime__link" id="Month">Month</a></li>
+    <li class="menu-graph__item"><a href="' . $page . 'displayType=' . $displayType . '&displayTime=Year" class="menu-graph__link displayTime__link" id="Year">Year</a></li>
     </ul>
+    <div id="passDisplayType" hidden>' . $displayType . '</div>
+    <div id="passDisplayTime" hidden>' . $displayTime . '</div>
+    </section>
     ');
     return;
 }

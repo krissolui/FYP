@@ -14,19 +14,31 @@ session_start();
 </head>
 <body>
 <header>
-<h1>Welcome to the Smart Power Tracker</h1>
+<div class="menu-btn">
+    <span class="menu-btn__burger"></span>
+</div>
 <?php
     if(isset($_SESSION['account'])) {
-        printTitleBar('home');
-        echo('<h2>Hello ' . $_SESSION['account'] . '!</h2>');
+        printMainMenu('home');
     } else {
-        printTitleBar('unlogHome');
+        printMainMenu('unlogHome');
     }
 ?>
+
 </header>
 
-<main>
-<?php flashMessage() ?>
+<main class="home-page">
+<section class="head-image"> 
+<h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+<hr>
+<?php
+    if(isset($_SESSION['account'])) {
+        echo('<h1 class="title subtitle">' . $_SESSION['account'] . '\'s Home</h1>');
+    }
+    flashMessage();
+?>
+</section>
 </main>
+<script src="js/main.js"></script>
 </body>
 </html>

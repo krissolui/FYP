@@ -1,0 +1,44 @@
+@include media-md {
+    .menu-btn {
+      visibility: hidden;
+    }
+  
+    .nav {
+      visibility: visible;
+  
+      .menu-nav {
+        display: block;
+        transform: translateY(0);
+        height: 100%;
+        background: rgba($primary-color, 0.6);
+        text-align: right;
+        padding: 0;
+        &__item {
+          display: inline;
+        //   padding-right: 1.5rem;
+        }
+  
+        &__link {
+          font-size: 1.5rem;
+          padding: 1.5rem 0.5rem;
+          border-radius: 4px;
+          
+          &:hover {
+            background: rgba($primary-color, 0.8);
+          }
+        }
+      }
+    }
+  
+    .title {
+        font-size: 2;
+    }
+  }
+  
+  @include media-lg {
+    
+  }
+  
+  @include media-xl {
+    
+  }

@@ -1,0 +1,57 @@
+.nav-graph {
+    .menu-graph {
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        justify-content: flex-end;
+        
+
+        &__item {
+            list-style: none;
+        }
+    }
+
+    a {
+        display: inline-block;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        padding: 0.5rem;
+        border: 2px solid $third-color;
+        border-radius: 4px;
+        box-shadow: 1px 1px 1px 1px #888888;
+        font-weight: 300;
+        @include transition-ease;
+
+        &:hover {
+            background-color: $third-color;
+            color: $secondary-color;
+        }
+    }
+
+    .active {
+        background-color: $third-color;
+        color: $secondary-color;
+    }
+
+    #selectDisplayType {
+        margin-top: 1rem;
+    }
+
+    #selectDisplayTime {
+        margin-bottom: 1rem;
+    }
+}
+
+
+#diagram {
+    p {
+        text-align: center;
+        margin: 1rem 0;
+        font-size: 1.2rem;
+        font-weight: 400;
+    }
+
+    #chartContainer {
+        margin: 1rem 0;
+    }
+}

@@ -98,29 +98,35 @@ try {
 </head>
 <body>
 <header>
-    <h1>Delete Family?</h1>
 </header>
 
-<main>
+<main class="deleteFamily-page">
+<section class="head-image">
+    <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+    <h1 class="title subtitle">Delete Family?</h1>
+</section>
 <?php flashMessage(); ?>
 
 <!-- Ask if delete family -->
+<section id="delete">
+
 <p>You are the admin of the family. Do you want to delete the family?<p>
 <p style="color: orange">*Cautious: Members of the family will no longer have access to devices that are connect through the family.</p>
 <form method="post">
-<div><input type="submit" name="deleteFamily" value="Yes"/></div>
+<div class="removeBtns"><input type="submit" name="deleteFamily" value="Yes" class="submitBtn"/>
 <?php
     try {
         if($member) {
-            echo('</form><div><button onclick="toggleVisibility(\'admin\')">No</button></div>');
+            echo('</div></form><div class="removeBtns"><button onclick="toggleVisibility(\'admin\')">No</button></div>');
         } else {
-            echo('<div><input type="submit" name="return" value="No"/></div></form>');
+            echo('<input type="submit" name="return" value="No" class="submitBtn"/></div></form>');
         }
     } catch(Throwable $e) {
         header('error.php');
         return;
     }
 ?>
+</section>
 
 <!-- Ask to change admin -->
 <section id="admin" hidden>
@@ -138,8 +144,8 @@ try {
         }
     ?>
 </select></p>
-<p><input type="submit" name="changeAdmin" value="Submit"/>
-<input type="submit" name="returnFamily" value="Cancel"/></p>
+<p class="removeBtns"><input type="submit" name="changeAdmin" value="Submit" class="submitBtn"/>
+<input type="submit" name="returnFamily" value="Cancel" class="submitBtn"/></p>
 </form>
 </section>
 
@@ -153,5 +159,6 @@ function toggleVisibility(id) {
     }
 }
 </script>
+<script src="js/main.js"></script>
 </main>
 </html>

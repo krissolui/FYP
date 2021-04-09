@@ -25,12 +25,24 @@ if(isset($_POST['logout'])) {
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-    <h1>Do You Want To Log Out?</h1>
-    <?php printTitleBar('logout'); ?>
+<header>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+    <?php printMainMenu('logout'); ?>
+</header>
 
+<main class="logout-page">
+<section class="head-image">
+    <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+    <h1 class="title subtitle">Do You Want To Log Out?</h1>
     <form method='POST'>
         <p><input type='submit' name='logout' value='Yes'/> &nbsp
         <input type='submit' name='stay' value='No'/></p>
     </form>
+</section>
+
+</main>
+    <script src="js/main.js"></script>
 </body>
 </html>

@@ -156,11 +156,17 @@ try {
 </head>
 <body>
 <header>
-    <h1><?=$_SESSION['account']?>'s Family</h1>
-    <?php printTitleBar('family'); ?>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+    <?php printMainMenu('family'); ?>
 </header>
 
-<main>
+<main class="family-page">
+    <section class="head-image">
+        <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+        <h1 class="title subtitle"><?=$_SESSION['account']?>'s Family</h1>
+    </section>
 <?php flashMessage() ?>
 
 <!-- Add family -->
@@ -170,7 +176,7 @@ try {
         <h3>New Family</h3>
         <form method="post">
             <p>Family Name: <input type="text" name="familyName"/></p>
-            <p><input type="submit" name="newFamily" value="Add New Family"/></p>
+            <p><input type="submit" name="newFamily" value="Add New Family" class="submitBtn"/></p>
         </form>
     </div>
     
@@ -178,7 +184,7 @@ try {
         <h3>Existing Family</h3>
         <form method="post">
             <p>Family ID: <input type="text" name="familyId"/></p>
-            <p><input type="submit" name="existingFamily" value="Add to Existing Family"/></p>
+            <p><input type="submit" name="existingFamily" value="Add to Existing Family" class="submitBtn"/></p>
         </form>
     </div>
 </section>
@@ -191,7 +197,7 @@ try {
             <p id="showFamilyName"></p>
             <input type="hidden" name="familyName" value="" id="familyName"/>
             <input type="hidden" name="familyId" value="" id="familyId"/>
-            <p><input type="submit" name="removeFamily" value="Yes"/>
+            <p id="removeBtns"><input type="submit" name="removeFamily" value="Yes" class="submitBtn"/>
             <button onclick="toggleVisibility('remove')">No</button></p>
         </form>
     </div>
@@ -279,5 +285,6 @@ try {
     }
 </script>
 </main>
+<script src="js/main.js"></script>
 </body>
 </html>

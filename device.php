@@ -317,6 +317,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
 <html lang='en'>
 <head>
     <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?=$_SESSION['account']?>'s Device</title>
     <link rel="stylesheet" href="css/main.css">
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
@@ -346,12 +347,30 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
 </head>
 <body>
 <header>
-    <h1><?=$_SESSION['account']?>'s Device</h1>
-    <?php printTitleBar('device'); ?>
+    <div class="menu-btn">
+      <span class="menu-btn__burger"></span>
+    </div>
+    <?php printMainMenu('device'); ?>
 </header>
 
-<main>
+<main class="device-page">
+<section class="head-image">
+    <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+    <h1 class="title subtitle"><?=$_SESSION['account']?>'s Device</h1>
+</section>
     <?php flashMessage(); ?>
+
+<!-- Print graph -->
+<section id="diagram">
+<!-- Select display type -->
+<?php printDisplayTypeMenu($displayType, $displayTime, 'device.php?'); ?>
+
+<!-- Select display time -->
+<?php printDisplayTimeMenu($displayType, $displayTime, 'device.php?'); ?>
+
+<div id="chartContainer" style="height: 370px; width: 100%;" <?php if($total == 0) {echo('hidden');} ?>></div>
+<p><strong>Average Power Consumption in Past <?=$displayTime?>:</strong> <?=number_format($total, 2, '.', '')?>W</p>
+</section>
 
 <!-- Add device -->
 <section id="add" hidden>
@@ -413,7 +432,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
                 }
                 ?>
             </select></p>
-            <p><input type="submit" name="newDevice" value="Add New Device"/></p>
+            <p><input type="submit" name="newDevice" value="Add New Device" class="submitBtn"/></p>
         </form>
     </div>
     
@@ -441,25 +460,13 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
                 }
                 ?>
             </select></p>
-            <p><input type="submit" name="existingDevice" value="Add to Existing Device"/></p>
+            <p><input type="submit" name="existingDevice" value="Add to Existing Device" class="submitBtn"/></p>
         </form>
     </div>
 </section>
 
 <!-- Remove device -->
 <?php printRemoveDevice(); ?>
-
-<!-- Print graph -->
-<section id="diagram">
-<!-- Select display type -->
-<?php printDisplayTypeBar($displayTime, 'device.php?'); ?>
-
-<!-- Select display time -->
-<?php printDisplayTimeBar($displayType, 'device.php?'); ?>
-
-<div id="chartContainer" style="height: 370px; width: 100%;" <?php if($total == 0) {echo('hidden');} ?>></div>
-<p><strong>Average Power Consumption in Past <?=$displayTime?>:</strong> <?=number_format($total, 2, '.', '')?>W</p>
-</section>
 
 <!-- Print table -->
 <table>
@@ -539,6 +546,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
         }
     }
 </script>
+<script src="js/main.js"></script>
 </main>
 </body>
 </html>

@@ -11,17 +11,24 @@ session_start();
 </head>
 <body>
 <header>
-    <h1>Contact Us</h1>
-    <?php 
+<div class="menu-btn">
+    <span class="menu-btn__burger"></span>
+</div>
+<?php 
     if(isset($_SESSION['account'])) {
-        printTitleBar('contact');
+        printMainMenu('contact');
     } else {
-        printTitleBar('unlogContact');
+        printMainMenu('unlogContact');
     }
     ?>
 </header>
-<main> 
+<main class="contact-page"> 
+<section class="head-image">
+    <h1 class="title">Smart Home - Power Consumption Monitoring System</h1>
+    <h1 class="title subtitle">Contact Us</h1>
+</section>
     <p>Email: elecFyp64@gmail.com</p>
 </main>
+<script src="js/main.js"></script>
 </body>
 </html>

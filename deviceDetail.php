@@ -312,7 +312,7 @@ try {
         $stmt = $pdo->prepare('SELECT name FROM User WHERE id = :adminId');
         $stmt->execute(array(':adminId' => $detail['admin']));
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        echo('<p>Admin: ' . $row['name'] . '</p>');
+        echo('<p>Admin: ' . htmlentities($row['name']) . '</p>');
     ?>
 
 <section id="addToFamily" <?php if(!$connect || count($list) < 1){echo('hidden');}?>>
@@ -326,7 +326,7 @@ try {
                             $stmt = $pdo->prepare('SELECT name FROM Family WHERE id = :familyId');
                             $stmt->execute(array(':familyId' => $id));
                             $familyName = $stmt->fetch(PDO::FETCH_ASSOC);
-                            echo('<option value="' . $id . '">' . $familyName['name'] . '</option>');
+                            echo('<option value="' . $id . '">' . htmlentities($familyName['name']) . '</option>');
                         } catch(Throwable $e) {
                             header('Location: error.php');
                             return;

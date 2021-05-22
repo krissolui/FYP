@@ -284,7 +284,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
             $stmt = $pdo->prepare('SELECT name FROM User WHERE id = :memId');
             $stmt->execute(array(':memId' => $mem['user_id']));
             $name = $stmt->fetch(PDO::FETCH_ASSOC);
-            echo('<tr><td>' . $name['name'] . '</td></tr>');
+            echo('<tr><td>' . htmlentities($name['name']) . '</td></tr>');
         }
     ?>
     </table>
@@ -305,9 +305,9 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
             $deviceDetail = $stmt->fetch(PDO::FETCH_ASSOC);
 
             echo('<tr>');
-            echo('<td><a href="deviceDetail.php?deviceName=' . $deviceDetail['name'] . '&deviceIp=' . $deviceDetail['ip_address'] . '">' . $deviceDetail['name'] . '</a></td>');
+            echo('<td><a href="deviceDetail.php?deviceName=' . htmlentities($deviceDetail['name']) . '&deviceIp=' . htmlentities($deviceDetail['ip_address']) . '">' . htmlentities($deviceDetail['name']) . '</a></td>');
             if(checkAdmin($familyDetail['admin'])) {
-                echo('<td><button onclick="remove(\'' . $deviceDetail['name'] . '\', \'' . $deviceDetail['id'] . '\', \'' . $deviceDetail['ip_address'] . '\')">-</button></td>');
+                echo('<td><button onclick="remove(\'' . htmlentities($deviceDetail['name']) . '\', \'' . $deviceDetail['id'] . '\', \'' . $deviceDetail['ip_address'] . '\')">-</button></td>');
             }
             echo('</tr>');
         }

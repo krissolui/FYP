@@ -424,7 +424,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
                         $stmt = $pdo->prepare('SELECT name FROM Family WHERE id = :familyId');
                         $stmt->execute(array(':familyId' => $family['family_id']));
                         $familyName = $stmt->fetch(PDO::FETCH_ASSOC);
-                        echo('<option value="' . $family['family_id'] . '">' . $familyName['name'] . '</option>');
+                        echo('<option value="' . $family['family_id'] . '">' . htmlentities($familyName['name']) . '</option>');
                     }
                 } catch(Throwable $e) {
                     header('Location: error.php');
@@ -452,7 +452,7 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
                         $stmt = $pdo->prepare('SELECT name FROM Family WHERE id = :familyId');
                         $stmt->execute(array(':familyId' => $family['family_id']));
                         $familyName = $stmt->fetch(PDO::FETCH_ASSOC);
-                        echo('<option value="' . $family['family_id'] . '">' . $familyName['name'] . '</option>');
+                        echo('<option value="' . $family['family_id'] . '">' . htmlentities($familyName['name']) . '</option>');
                     }
                 } catch(Throwable $e) {
                     header('Location: error.php');
@@ -498,10 +498,10 @@ setPieDataPoints($displayType, $devices, $details, $labels, $avgs, $total, $data
             }
 
             echo('<tr>');
-            echo('<td><a href="deviceDetail.php?deviceName=' . $deviceDetail['name'] . '&deviceIp=' . $deviceDetail['ip_address'] . '">' . $deviceDetail['name'] . '</a></td>');
+            echo('<td><a href="deviceDetail.php?deviceName=' . htmlentities($deviceDetail['name']) . '&deviceIp=' . htmlentities($deviceDetail['ip_address']) . '">' . htmlentities($deviceDetail['name']) . '</a></td>');
             echo('<td>' . $type['name'] . '</td>');
             echo('<td>' . $location['name'] . '</td>');
-            echo('<td><button onclick="remove(\'' . $deviceDetail['name'] . '\', \'' . $deviceDetail['id'] . '\', \'' . $deviceDetail['ip_address'] . '\')">-</button></td>');
+            echo('<td><button onclick="remove(\'' . htmlentities($deviceDetail['name']) . '\', \'' . $deviceDetail['id'] . '\', \'' . htmlentities($deviceDetail['ip_address']) . '\')">-</button></td>');
             echo('</tr>');
         }
     ?>

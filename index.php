@@ -33,7 +33,7 @@ session_start();
 <hr>
 <?php
     if(isset($_SESSION['account'])) {
-        echo('<h1 class="title subtitle">' . $_SESSION['account'] . '\'s Home</h1>');
+        echo('<h1 class="title subtitle">' . htmlentities($_SESSION['account']) . '\'s Home</h1>');
     }
     flashMessage();
 ?>

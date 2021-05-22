@@ -127,7 +127,7 @@ if(isset($_POST['deleteDevice'])) {
             $stmt = $pdo->prepare('SELECT id, name FROM User WHERE id = :userId');
             $stmt->execute(array(':userId' => $memberId));
             $mem = $stmt->fetch(PDO::FETCH_ASSOC);
-            echo('<option value="' . $mem['id'] . '">' . $mem['name'] . '</option>');
+            echo('<option value="' . $mem['id'] . '">' . htmlentities($mem['name']) . '</option>');
         }
     ?>
 </select></p>

@@ -230,7 +230,7 @@ try {
             }
 
             echo('<tr>');
-            echo('<td><a href="familyDetail.php?familyName=' . $familyDetail['name'] . '&familyId=' . $familyDetail['id'] . '">' . $familyDetail['name'] . '</a></td><td>');
+            echo('<td><a href="familyDetail.php?familyName=' . htmlentities($familyDetail['name']) . '&familyId=' . $familyDetail['id'] . '">' . htmlentities($familyDetail['name']) . '</a></td><td>');
             foreach($member as $mem) {
                 try {
                     $stmt = $pdo->prepare('SELECT name FROM User WHERE id = :userId');
@@ -242,7 +242,7 @@ try {
                     return;
                 }
             }
-            echo('</td><td><button onclick="remove(\'' . $familyDetail['name'] . '\', \'' . $familyDetail['id'] . '\')">-</button></td></tr>');
+            echo('</td><td><button onclick="remove(\'' . htmlentities($familyDetail['name']) . '\', \'' . $familyDetail['id'] . '\')">-</button></td></tr>');
         }
     ?>
 </table>

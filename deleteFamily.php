@@ -140,7 +140,7 @@ try {
             $stmt = $pdo->prepare('SELECT id, name FROM User WHERE id = :userId');
             $stmt->execute(array(':userId' => $memId));
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            echo('<option value="' . $user['id'] . '">' . $user['name'] . '</option>');
+            echo('<option value="' . $user['id'] . '">' . htmlentities($user['name']) . '</option>');
         }
     ?>
 </select></p>

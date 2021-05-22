@@ -8,23 +8,28 @@ session_start();
 
 
 if(isset($_POST['add'])) {
-	if(strlen($_POST['max']) < 1) {
-		$max = 12;
+	if(strlen($_POST['maxCurrent']) < 1) {
+		$maxCurrent = 12;
 	} else { 
-		$max = intval($_POST['max']); 
+		$maxCurrent = intval($_POST['maxCurrent']); 
 	}
-	if(strlen($_POST['min']) < 1) {
-		$min = 8;
+	if(strlen($_POST['minCurrent']) < 1) {
+		$minCurrent = 0;
 	} else { 
-		$min = intval($_POST['min']); 
+		$minCurrent = intval($_POST['minCurrent']); 
 	}
-	if(strlen($_POST['voltage']) < 1) {
-		$voltage = 50;
+	if(strlen($_POST['maxVoltage']) < 1) {
+		$maxVoltage = 24;
 	} else { 
-		$voltage = intval($_POST['voltage']); 
+		$maxVoltage = intval($_POST['maxVoltage']); 
+	}
+	if(strlen($_POST['minVoltage']) < 1) {
+		$minVoltage = 5;
+	} else { 
+		$minVoltage = intval($_POST['minVoltage']); 
 	}
 
-	$_SESSION['error'] = 'Max:' . $max . ' Min:' . $min . ' Voltage:' . $voltage;
+	$_SESSION['error'] = 'Max Current:' . $maxCurrent . ' Min Current:' . $minCurrent . ' Max Voltage:' . $maxVoltage . ' Min Voltage:' . $minVoltage;
 
 	if(isset($_POST['deviceId']) && strlen($_POST['deviceId'])) {
 		try {
@@ -34,18 +39,19 @@ if(isset($_POST['add'])) {
 			
 			if($row) {
 				$time = time();
-				$num = 365 * 24 * 6; //Record every 10 minutes
+				$num = 30 * 24 * 6; //Record every 10 minutes
 				$diff = 60 * 10;
 
 				for($i = 0; $i < $num; $i++) {
-					$rand = rand($min, $max);
+					$current = rand($minCurrent, $maxCurrent);
+					$voltage = rand($minVoltage, $maxVoltage);
 					$timeStamp = date('Y-m-d H:i:s', $time);
 
 					$stmt = $pdo->prepare('INSERT INTO Record (device_id, time, current, voltage) values (:deviceId, :time, :current, :voltage)');
                 	$stmt->execute(array(
                     ':deviceId' => $row['id'],
                     ':time' => $timeStamp,
-                    ':current' => $rand,
+                    ':current' => $current,
 					':voltage' => $voltage
 					));
 
@@ -98,9 +104,9 @@ if(isset($_POST['delete'])) {
 
 <form method="post">
 <p>Device ID: <input type="text" name="deviceId"/></p>
-<p>Max. <input type="text" name="max"/> &nbsp Min. <input type="text" name="min"/></p>
-<p>Voltage: <input type="text" name="voltage"/></p>
-<p>Add 1 year of data to this device?</p>
+<p>Max. Current <input type="text" name="maxCurrent"/> &nbsp Min. Current <input type="text" name="minCurrent"/></p>
+<p>Max. Voltage: <input type="text" name="maxVoltage"/> &nbsp Min. Voltage <input type="text" name="minVoltage"/></p>
+<p>Add 1 month of data to this device?</p>
 <p><input type="submit" name="add" value="Yes"/></p>
 </form>
 
